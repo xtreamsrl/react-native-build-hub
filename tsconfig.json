@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "importHelpers": true,
+    "module": "commonjs",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "target": "es2019",
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

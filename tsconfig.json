@@ -9,9 +9,13 @@
     "noImplicitAny": true,
     "noEmitOnError": true,
     "target": "es2019",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"
-  ]
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }

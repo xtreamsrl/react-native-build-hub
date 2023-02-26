@@ -19,13 +19,21 @@
   "dependencies": {
     "@oclif/core": "^2",
     "@oclif/plugin-help": "^5",
-    "@oclif/plugin-plugins": "^2.3.2"
+    "@oclif/plugin-plugins": "^2.3.2",
+    "@react-native-community/cli-platform-ios": "^10.2.0",
+    "axios": "^1.3.4",
+    "chalk": "^4.1.2",
+    "prompts": "^2.4.2"
   },
   "devDependencies": {
     "@oclif/test": "^2.3.7",
+    "@react-native-community/cli": "^10.2.0",
+    "@react-native-community/cli-platform-android": "^10.2.0",
+    "@react-native-community/cli-tools": "^10.1.1",
     "@types/chai": "^4",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.18.12",
+    "@types/prompts": "^2.4.2",
     "chai": "^4",
     "eslint": "^7.32.0",
     "eslint-config-oclif": "^4",
@@ -51,8 +59,8 @@
     "build": "shx rm -rf dist && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "shx rm -f oclif.manifest.json",
-    "posttest": "yarn lint",
-    "prepack": "yarn build && oclif manifest && oclif readme",
+    "posttest": "npm run lint",
+    "prepack": "npm run build && oclif manifest && oclif readme",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif readme && git add README.md"
   },

@@ -36,7 +36,7 @@ export default class Build extends Command {
     }
     if (shouldBuildAndroid) {
       this.log('Building android')
-      buildAndroid();
+      buildAndroid('dev');
     }
   }
 }

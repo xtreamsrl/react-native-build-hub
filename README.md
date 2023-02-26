@@ -29,8 +29,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`react-native-engine hello PERSON`](#react-native-engine-hello-person)
-* [`react-native-engine hello world`](#react-native-engine-hello-world)
+* [`react-native-engine build [FILE]`](#react-native-engine-build-file)
 * [`react-native-engine help [COMMANDS]`](#react-native-engine-help-commands)
 * [`react-native-engine plugins`](#react-native-engine-plugins)
 * [`react-native-engine plugins:install PLUGIN...`](#react-native-engine-pluginsinstall-plugin)
@@ -41,46 +40,36 @@ USAGE
 * [`react-native-engine plugins:uninstall PLUGIN...`](#react-native-engine-pluginsuninstall-plugin-1)
 * [`react-native-engine plugins:uninstall PLUGIN...`](#react-native-engine-pluginsuninstall-plugin-2)
 * [`react-native-engine plugins update`](#react-native-engine-plugins-update)
+* [`react-native-engine run [FILE]`](#react-native-engine-run-file)
 
-## `react-native-engine hello PERSON`
+## `react-native-engine build [FILE]`
 
-Say hello
+Create native builds for android and ios
 
 ```
 USAGE
-  $ react-native-engine hello PERSON -f <value>
+  $ react-native-engine build [FILE] [-i] [-a] [--all]
 
 ARGUMENTS
-  PERSON  Person to say hello to
+  FILE  file to read
 
 FLAGS
-  -f, --from=<value>  (required) Who is saying hello
+  -a, --android  Generate android native build
+  -i, --ios      Generate ios native build
+  --all
 
 DESCRIPTION
-  Say hello
+  Create native builds for android and ios
 
 EXAMPLES
-  $ oex hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
+  $ react-native-engine build -i
+
+  $ react-native-engine build -a
+
+  $ react-native-engine build -all
 ```
 
-_See code: [dist/commands/hello/index.ts](https://github.com/xtreamsrl/react-native-engine/blob/v0.0.0/dist/commands/hello/index.ts)_
-
-## `react-native-engine hello world`
-
-Say hello world
-
-```
-USAGE
-  $ react-native-engine hello world
-
-DESCRIPTION
-  Say hello world
-
-EXAMPLES
-  $ react-native-engine hello world
-  hello world! (./src/commands/hello/world.ts)
-```
+_See code: [dist/commands/build.ts](https://github.com/xtreamsrl/react-native-engine/blob/v0.0.0/dist/commands/build.ts)_
 
 ## `react-native-engine help [COMMANDS]`
 
@@ -334,4 +323,28 @@ FLAGS
 DESCRIPTION
   Update installed plugins.
 ```
+
+## `react-native-engine run [FILE]`
+
+describe the command here
+
+```
+USAGE
+  $ react-native-engine run [FILE] [-n <value>] [-f]
+
+ARGUMENTS
+  FILE  file to read
+
+FLAGS
+  -f, --force
+  -n, --name=<value>  name to print
+
+DESCRIPTION
+  describe the command here
+
+EXAMPLES
+  $ react-native-engine run
+```
+
+_See code: [dist/commands/run.ts](https://github.com/xtreamsrl/react-native-engine/blob/v0.0.0/dist/commands/run.ts)_
 <!-- commandsstop -->

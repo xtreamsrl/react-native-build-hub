@@ -1,7 +1,8 @@
 import path from "path";
-import { execSync } from "child_process";
+import {executeCommand, getAppName, getProjectRootDir, getRootDestinationFolder} from './utils'
+import {ux} from "@oclif/core";
 
-const appName = "newRNArcTest";
+const appName = getAppName();
 
 const IOSBuildFlavors = {
   dev: { scheme: appName, config: "Debug", flavorDir: "Debug" }
@@ -20,25 +21,19 @@ const iosBuildPlatforms = {
   }
 };
 
-const ROOT_PROJECT_FOLDER = path.join(__dirname, "..", "..");
-
 function installPods() {
-  console.log("\n*** Installing Pods ***");
-  const iosFolder = path.join(ROOT_PROJECT_FOLDER, "ios");
-  execSync("pod install", { cwd: iosFolder });
+  ux.debug('Pod install');
+  const iosFolder = path.join(getProjectRootDir(), "ios");
+  executeCommand("pod install", { cwd: iosFolder });
 }
 
-function _buildIos() {
-  const buildType = "dev";
-  const platformName = "simulator";
-  console.log("\n*** Building iOS ***");
-  const iosFolder = path.join(ROOT_PROJECT_FOLDER, "ios");
+function _buildIos(buildType: keyof typeof IOSBuildFlavors, platformName: keyof typeof iosBuildPlatforms) {
+  const iosFolder = path.join(getProjectRootDir(), "ios");
   const workspacePath = path.join(iosFolder, `${appName}.xcworkspace`);
   const buildFlavor = IOSBuildFlavors[buildType];
   const platform = iosBuildPlatforms[platformName];
-  const version = "1.0.0";
-  const archivePath = `${iosFolder}/build/Products/${appName}.xcarchive`;
 
+  const archivePath = `${iosFolder}/build/Products/${appName}.xcarchive`;
 
   const buildCommand = `RCT_NO_LAUNCH_PACKAGER=true xcodebuild \
       -workspace "${workspacePath}" \
@@ -51,21 +46,20 @@ function _buildIos() {
     `;
 
   console.log("Executing:", buildCommand);
-  execSync(buildCommand, { stdio: "inherit" });
-
+  executeCommand(buildCommand);
 
   if (platform.buildCmd === "build") {
     const source = `${iosFolder}/DerivedData/${appName}/build/Products/${buildFlavor.flavorDir}-${platform.name}/${appName}.${platform.ext}`;
-    const destinationDir = `${ROOT_PROJECT_FOLDER}/app_builds/${platform.name}/${buildType}`;
-    execSync(`mkdir -p ${destinationDir}`);
+    const destinationDir = `${getRootDestinationFolder()}/ios/${platform.name}/${buildType}`;
+    executeCommand(`mkdir -p ${destinationDir}`);
     const destination = `${destinationDir}/${appName}.app`;
-    execSync(`rm -rf ${destination}`);
+    executeCommand(`rm -rf ${destination}`);
     const copyCommand = `cp -a '${source}' '${destination}'`;
     console.log(`Copying: ${copyCommand}`);
-    execSync(copyCommand);
+    executeCommand(copyCommand);
     return destination;
   } else { // archive
-
+    // todo
   }
 
   const generateIpaCommand = `xcodebuild -exportArchive \
@@ -74,11 +68,11 @@ function _buildIos() {
       -exportOptionsPlist ${iosFolder}/${appName}/info.plist \
       -allowProvisioningUpdates
     `;
-  execSync(generateIpaCommand, { stdio: "inherit" });
+  executeCommand(generateIpaCommand);
 
 }
 
-export function buildIos() {
+export function buildIos(buildType: keyof typeof IOSBuildFlavors, platformName: keyof typeof iosBuildPlatforms) {
   installPods();
-  _buildIos();
+  _buildIos(buildType, platformName);
 }

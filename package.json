@@ -22,6 +22,9 @@
     "@oclif/plugin-plugins": "^2.3.2",
     "@react-native-community/cli-platform-ios": "^10.2.0",
     "axios": "^1.3.4",
+
+
+
     "chalk": "^4.1.2",
     "prompts": "^2.4.2"
   },

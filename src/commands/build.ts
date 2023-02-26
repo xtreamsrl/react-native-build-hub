@@ -7,8 +7,8 @@ export default class Build extends Command {
   static description = 'Create native builds for android and ios'
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> -i',
-    '<%= config.bin %> <%= command.id %> -a',
+    '<%= config.bin %> <%= command.id %> -i -f dev',
+    '<%= config.bin %> <%= command.id %> -a -f prod',
     '<%= config.bin %> <%= command.id %> -all',
   ]
 
@@ -16,6 +16,7 @@ export default class Build extends Command {
     ios: Flags.boolean({char: 'i', description: 'Generate ios native build'}),
     android: Flags.boolean({char: 'a', description: 'Generate android native build'}),
     all: Flags.boolean({description: 'Generate both ios and android native build'}),
+    flavor: Flags.string({char: 'f', description: 'Specify flavor to build', default:'dev'}),
   }
 
   static args = {
@@ -27,16 +28,17 @@ export default class Build extends Command {
 
     const shouldBuildAndroid = flags.android ?? flags.all;
     const shouldBuildIos = flags.ios ?? flags.all;
+    const buildFlavor = flags.flavor;
 
     this.log('Build app', getAppName());
 
     if (shouldBuildIos) {
       this.log('Build ios')
-      buildIos('dev', 'simulator');
+      buildIos(buildFlavor, 'simulator');
     }
     if (shouldBuildAndroid) {
       this.log('Building android')
-      buildAndroid('dev');
+      buildAndroid(buildFlavor as any);
     }
   }
 }

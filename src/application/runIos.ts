@@ -1,10 +1,11 @@
-import childProcess from 'child_process'
+import childProcess, {execFileSync} from 'child_process'
 import fs from 'fs'
 import prompts from 'prompts'
 import chalk from 'chalk'
 import {executeCommand, getProjectRootDir} from './utils'
 import {buildIos} from './buildIos'
 import {getIosBuildDestination, iosBuildPlatforms} from './iosUtils'
+import path from 'path'
 
 // todo default app name improve passing from command line
 
@@ -78,15 +79,12 @@ async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]>
   return devices
 }
 
-export async function runApp(buildType: string, appId: string) {
+export async function runApp(buildType: string) {
 
   // todo run on phisical devices
   if (!checkBuildPresent(getProjectRootDir(), buildType, iosBuildPlatforms.simulator)) {
     buildIos(buildType as any, 'simulator')
   }
-
-  // todo improve run on device
-  executeCommand('open -a Simulator')
 
   const devices = getDevices()
 
@@ -116,10 +114,22 @@ export async function runApp(buildType: string, appId: string) {
 
   }
 
+  // todo improve run on device
+  executeCommand('open -a Simulator')
+
+  const {destination} = getIosBuildDestination(
+    iosBuildPlatforms.simulator,
+    buildType,
+  )
+
+  const bundleID = execFileSync('/usr/libexec/PlistBuddy', ['-c', 'Print:CFBundleIdentifier', path.join(destination, 'Info.plist')], {
+    encoding: 'utf8'
+  }).trim();
+
   for (const device of devicesToRun) {
     const id = device.udid
     installApp(id, getProjectRootDir(), buildType, iosBuildPlatforms.simulator)
-    launchApp(id, appId)
+    launchApp(id, bundleID);
   }
 
 }

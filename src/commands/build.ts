@@ -7,8 +7,8 @@ export default class Build extends Command {
   static description = 'Create native builds for android and ios'
 
   static examples = [
-    '<%= config.bin %> <%= command.id %> -i -f dev',
-    '<%= config.bin %> <%= command.id %> -a -f prod',
+    '<%= config.bin %> <%= command.id %> -i -f=dev',
+    '<%= config.bin %> <%= command.id %> -a -f=prod',
     '<%= config.bin %> <%= command.id %> -all',
   ]
 

@@ -38,7 +38,8 @@ export default class Build extends Command {
     }
     if (shouldBuildAndroid) {
       this.log('Building android')
-      buildAndroid(buildFlavor as any);
+      // build release and debug?
+      buildAndroid(buildFlavor);
     }
   }
 }

@@ -36,7 +36,7 @@ export default class Run extends Command {
 
     if (shouldRunAndroid) {
       // todo build and appId
-      runAndroid('dev', 'com.newrnarctest')
+      runAndroid(buildFlavor)
     }
     if (shouldRunIos) {
       runIos(buildFlavor)

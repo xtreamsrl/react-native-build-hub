@@ -62,7 +62,12 @@ export function getIosFlavors(flavorName: string) {
   return config.ios.flavors[flavorName]
 }
 
-export function getAndroidFlavors(flavorName: string) {
+export function getAndroidFlavors(flavorName?: string) {
+  if(!flavorName){
+    return {
+      gradleFlavor: flavorName,
+    }
+  }
   const flavorConfig = config?.android?.flavors?.[flavorName];
   if(flavorConfig){
     return flavorConfig;

@@ -31,7 +31,7 @@ function getBootedDevices() {
   return String(output).trim().split('\n')
 }
 
-function checkBuildPresent(buildType: string) {
+function checkBuildPresent(buildType?: string) {
   const appPath = getAppBuildFolder(buildType)
   console.debug('appPath', appPath)
   return fs.existsSync(appPath)
@@ -59,7 +59,7 @@ function findBestApkInFolder(dir: string, arc?: string) {
   }
 }
 
-function installApp(device: string, engineDir: string, buildType: string) {
+function installApp(device: string, engineDir: string, buildType?: string) {
   const appDir = getAppBuildFolder(buildType)
 
   const cpu = adb.getCPU(getAdbPath(), device)
@@ -103,7 +103,7 @@ function getBundleIdentifier(appBuildFolder: string): string {
 
 }
 
-export async function runApp(buildType: string, port = '8081') {
+export async function runApp(buildType?: string, port = '8081') {
 
   if (!checkBuildPresent(buildType)) {
     buildAndroid(buildType)

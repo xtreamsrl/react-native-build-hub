@@ -7,7 +7,7 @@ function capitalize(str: string) {
   return str
 }
 
-export function buildAndroid(buildType: string) {
+export function buildAndroid(buildType?: string) {
   // todo improve flavor management with debug and release and no flavor usage
   const buildFlavor = getAndroidFlavors(buildType)
   if (!buildFlavor) {

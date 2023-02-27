@@ -13,7 +13,7 @@ export default class Run extends Command {
   static flags = {
     android: Flags.boolean({char: 'a', description: 'Run the android app'}),
     ios: Flags.boolean({char: 'i', description: 'Run the ios app'}),
-    flavor: Flags.string({char: 'f', description: 'Specify flavor to build', default:'dev'}),
+    flavor: Flags.string({char: 'f', description: 'Specify flavor to build'}),
   }
 
   static args = {
@@ -39,7 +39,7 @@ export default class Run extends Command {
       runAndroid(buildFlavor)
     }
     if (shouldRunIos) {
-      runIos(buildFlavor)
+      runIos(buildFlavor!)
     }
   }
 }

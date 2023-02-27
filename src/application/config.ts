@@ -13,6 +13,13 @@ export type Config = {
         flavorDir: string;
       }
     }
+  },
+  android?: {
+    flavors?: {
+      [key: string]: {
+        gradleFlavor: string;
+      }
+    }
   }
 }
 
@@ -24,6 +31,13 @@ function getDefaultConfig(): Config {
           scheme: getAppName(),
           config: 'Debug',
           flavorDir: 'Debug',
+        },
+      },
+    },
+    android: {
+      flavors: {
+        dev: {
+          gradleFlavor: 'debug',
         },
       },
     },
@@ -44,8 +58,19 @@ export function loadConfig() {
 
 const config = loadConfig()
 
-export function getIosFlavors(flavorName:string) {
-  return config.ios.flavors[flavorName];
+export function getIosFlavors(flavorName: string) {
+  return config.ios.flavors[flavorName]
+}
+
+export function getAndroidFlavors(flavorName: string) {
+  const flavorConfig = config?.android?.flavors?.[flavorName];
+  if(flavorConfig){
+    return flavorConfig;
+  }else {
+    return {
+      gradleFlavor: flavorName,
+    }
+  }
 }
 
 export default config

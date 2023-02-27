@@ -8,6 +8,8 @@ import adb from '@react-native-community/cli-platform-android/build/commands/run
 import _getAdbPath from '@react-native-community/cli-platform-android/build/commands/runAndroid/getAdbPath'
 import tryLaunchEmulator from '@react-native-community/cli-platform-android/build/commands/runAndroid/tryLaunchEmulator'
 import {buildAndroid} from './buildAndroid'
+import {getAppBuildFolder} from './androidUtils'
+import path from 'path'
 
 function getAdbPath() {
   const androidHome = process.env.ANDROID_HOME
@@ -29,20 +31,43 @@ function getBootedDevices() {
   return String(output).trim().split('\n')
 }
 
-function getBuildFolder(buildType: string) {
-  const appPath = `${getRootDestinationFolder()}/android/${buildType}/${getAppName()}.apk`
-  return appPath
-}
-
 function checkBuildPresent(buildType: string) {
-  const appPath = getBuildFolder(buildType)
+  const appPath = getAppBuildFolder(buildType)
+  console.debug('appPath', appPath)
   return fs.existsSync(appPath)
 }
 
-function installApp(device: string, engineDir: string, buildType: string) {
-  const appPath = getBuildFolder(buildType)
+function findBestApkInFolder(dir: string, arc?: string) {
 
-  execSync(`${getAdbPath()} -s ${device} install -r ${appPath}`)
+  const files = fs.readdirSync(dir)
+  // todo debug
+  const singleApkFound = files.find(f => f === 'app-debug.apk')
+  if (singleApkFound) {
+    return path.join(dir, 'app-debug.apk')
+  } else {
+    if (arc) {
+      const apkForArc = files.find(f => f.includes(arc))
+      if (apkForArc) {
+        return path.join(dir, apkForArc)
+      } else {
+        throw Error('Unable to find correct apk in' + dir)
+      }
+    } else {
+      throw Error('Unable to find correct apk in' + dir)
+    }
+
+  }
+}
+
+function installApp(device: string, engineDir: string, buildType: string) {
+  const appDir = getAppBuildFolder(buildType)
+
+  const cpu = adb.getCPU(getAdbPath(), device)
+  console.debug('cpus', cpu)
+
+  const apkPath = findBestApkInFolder(appDir, cpu || undefined)
+
+  execSync(`${getAdbPath()} -s ${device} install -r ${apkPath}`)
 }
 
 function launchApp(device: string, packageId: string) {
@@ -64,13 +89,29 @@ async function getAvailableDevicePort(port = 5552): Promise<number> {
   return port
 }
 
-export async function runApp(buildType: string, appId: string, port = '8081') {
+function getBundleIdentifier(appBuildFolder: string): string {
 
-  if(!checkBuildPresent(buildType)) {
-    buildAndroid(buildType as any);
+  if (fs.existsSync(path.join(appBuildFolder, 'output-metadata.json'))) {
+    const id = JSON.parse(fs.readFileSync(path.join(appBuildFolder, 'output-metadata.json'), 'utf-8'))?.applicationId
+    if (id) {
+      return id
+    }
+  }
+
+  // todo improve bundle id identifier
+  return 'todo'
+
+}
+
+export async function runApp(buildType: string, port = '8081') {
+
+  if (!checkBuildPresent(buildType)) {
+    buildAndroid(buildType)
   }
 
   const device = await listAndroidDevices()
+
+  const appIdentifier = getBundleIdentifier(getAppBuildFolder(buildType))
 
   if (!device) {
     throw new Error('No android devices available')
@@ -79,7 +120,7 @@ export async function runApp(buildType: string, appId: string, port = '8081') {
       tryRunAdbReverse(port, device.deviceId!)
 
       installApp(device.deviceId!, getProjectRootDir(), buildType)
-      launchApp(device.deviceId!, appId)
+      launchApp(device.deviceId!, appIdentifier)
 
     } else {
       const newEmulatorPort = await getAvailableDevicePort()
@@ -91,7 +132,7 @@ export async function runApp(buildType: string, appId: string, port = '8081') {
         tryRunAdbReverse(port, emulator)
 
         installApp(emulator, getProjectRootDir(), buildType)
-        launchApp(emulator, appId)
+        launchApp(emulator, appIdentifier)
 
       }
     }

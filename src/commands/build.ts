@@ -17,6 +17,7 @@ export default class Build extends Command {
     android: Flags.boolean({char: 'a', description: 'Generate android native build'}),
     all: Flags.boolean({description: 'Generate both ios and android native build'}),
     flavor: Flags.string({char: 'f', description: 'Specify flavor to build'}),
+    incremental: Flags.boolean({char: 'I', description: 'Incremental build', default: false}),
   }
 
   static args = {
@@ -26,20 +27,20 @@ export default class Build extends Command {
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(Build)
 
-    const shouldBuildAndroid = flags.android ?? flags.all;
-    const shouldBuildIos = flags.ios ?? flags.all;
-    const buildFlavor = flags.flavor;
+    const shouldBuildAndroid = flags.android ?? flags.all
+    const shouldBuildIos = flags.ios ?? flags.all
+    const buildFlavor = flags.flavor
 
-    this.log('Build app', getAppName());
+    this.log('Build app', getAppName())
 
     if (shouldBuildIos) {
       this.log('Build ios')
-      buildIos(buildFlavor, 'simulator');
+      buildIos(buildFlavor, 'simulator')
     }
     if (shouldBuildAndroid) {
       this.log('Building android')
       // build release and debug?
-      buildAndroid(buildFlavor);
+      buildAndroid(buildFlavor, flags.incremental)
     }
   }
 }

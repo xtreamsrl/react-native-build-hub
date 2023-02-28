@@ -2,6 +2,8 @@ import {Args, Command, Flags} from '@oclif/core'
 import {runApp as runAndroid} from '../application/runAndroid'
 import {runApp as runIos} from '../application/runIos'
 import {startMetro, checkIsMetroRunning} from '../application/metroManager'
+import loadConfig from '@react-native-community/cli-config'
+import {getProjectRootDir} from '../application/utils'
 
 export default class Run extends Command {
   static description = 'Run the native app'

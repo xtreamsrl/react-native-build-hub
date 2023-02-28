@@ -36,8 +36,9 @@ function _buildIos(buildType: string, platformName: keyof typeof iosBuildPlatfor
   executeCommand(buildCommand)
 
   if (platform.buildCmd === 'build') {
-    const source = `${iosFolder}/DerivedData/${appName}/build/Products/${buildFlavor.flavorDir}-${platform.name}/${appName}.${platform.ext}`
-    const {destinationDir, destination} = getIosBuildDestination(platform, buildType);
+    // todo handle Debug/release
+    const source = `${iosFolder}/DerivedData/${appName}/build/Products/Debug-${platform.name}/${appName}.${platform.ext}`
+    const {destinationDir, destination} = getIosBuildDestination(platform, buildFlavor.flavorDir);
 
     executeCommand(`mkdir -p ${destinationDir}`)
     executeCommand(`rm -rf ${destination}`)

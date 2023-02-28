@@ -58,20 +58,27 @@ export function loadConfig() {
 
 const config = loadConfig()
 
-export function getIosFlavors(flavorName: string) {
+export function getIosFlavors(flavorName?: string) {
+  if (!flavorName) {
+    return {
+      scheme: getAppName(),
+      config: 'Debug',
+      flavorDir: getAppName(),
+    }
+  }
   return config.ios.flavors[flavorName]
 }
 
 export function getAndroidFlavors(flavorName?: string) {
-  if(!flavorName){
+  if (!flavorName) {
     return {
       gradleFlavor: flavorName,
     }
   }
-  const flavorConfig = config?.android?.flavors?.[flavorName];
-  if(flavorConfig){
-    return flavorConfig;
-  }else {
+  const flavorConfig = config?.android?.flavors?.[flavorName]
+  if (flavorConfig) {
+    return flavorConfig
+  } else {
     return {
       gradleFlavor: flavorName,
     }

@@ -16,7 +16,8 @@ export const iosBuildPlatforms = {
 
 
 export function getIosBuildDestination(platform: { ext: string; buildCmd: string; name: string }, buildType: string) {
-  const destinationDir = `${getRootDestinationFolder()}/ios/${platform.name}/${buildType}`
+  // todo handle Debug/release
+  const destinationDir = `${getRootDestinationFolder()}/ios/${platform.name}-Debug/${buildType}`
   const destination = `${destinationDir}/${getAppName()}.${platform.ext}`
   return {destinationDir, destination}
 }

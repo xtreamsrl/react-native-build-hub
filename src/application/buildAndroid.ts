@@ -20,10 +20,10 @@ export function buildAndroid(buildType?: string) {
 
   const gradleBuildTask = (gradleFlavor && gradleFlavor !== 'debug') ? `install${capitalize(gradleFlavor)}Debug` : 'installDebug'
 
-/*   executeCommand(`${androidFolder}/gradlew \
+  executeCommand(`${androidFolder}/gradlew \
       -Duser.dir=${androidFolder} \
       app:${gradleBuildTask} \
-    `, {stdio: 'inherit'}) */
+    `, {stdio: 'inherit'})
 
   const destinationDir = getAppBuildFolder(buildType)
   executeCommand(`rm -rf ${destinationDir} && mkdir -p ${destinationDir}`)

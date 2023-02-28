@@ -63,7 +63,6 @@ function installApp(device: string, engineDir: string, buildType?: string) {
   const appDir = getAppBuildFolder(buildType)
 
   const cpu = adb.getCPU(getAdbPath(), device)
-  console.debug('cpus', cpu)
 
   const apkPath = findBestApkInFolder(appDir, cpu || undefined)
 

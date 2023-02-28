@@ -2,10 +2,11 @@ import childProcess, {execFileSync} from 'child_process'
 import fs from 'fs'
 import prompts from 'prompts'
 import chalk from 'chalk'
-import {executeCommand, getProjectRootDir} from './utils'
+import {executeCommand, getAppName, getProjectRootDir} from './utils'
 import {buildIos} from './buildIos'
 import {getIosBuildDestination, iosBuildPlatforms} from './iosUtils'
 import path from 'path'
+import {getIosFlavors} from './config'
 
 // todo default app name improve passing from command line
 
@@ -79,10 +80,12 @@ async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]>
   return devices
 }
 
-export async function runApp(buildType: string) {
+export async function runApp(buildType?: string) {
+
+  const buildFlavor = getIosFlavors(buildType)
 
   // todo run on phisical devices
-  if (!checkBuildPresent(getProjectRootDir(), buildType, iosBuildPlatforms.simulator)) {
+  if (!checkBuildPresent(getProjectRootDir(), buildFlavor.scheme, iosBuildPlatforms.simulator)) {
     buildIos(buildType as any, 'simulator')
   }
 
@@ -119,7 +122,7 @@ export async function runApp(buildType: string) {
 
   const {destination} = getIosBuildDestination(
     iosBuildPlatforms.simulator,
-    buildType,
+    buildFlavor.scheme,
   )
 
   const bundleID = execFileSync('/usr/libexec/PlistBuddy', ['-c', 'Print:CFBundleIdentifier', path.join(destination, 'Info.plist')], {
@@ -128,7 +131,7 @@ export async function runApp(buildType: string) {
 
   for (const device of devicesToRun) {
     const id = device.udid
-    installApp(id, getProjectRootDir(), buildType, iosBuildPlatforms.simulator)
+    installApp(id, getProjectRootDir(), buildFlavor.scheme, iosBuildPlatforms.simulator)
     launchApp(id, bundleID);
   }
 

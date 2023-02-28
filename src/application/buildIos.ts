@@ -12,7 +12,7 @@ function installPods() {
   executeCommand('pod install', {cwd: iosFolder})
 }
 
-function _buildIos(buildType: string, platformName: keyof typeof iosBuildPlatforms) {
+function _buildIos(buildType?: string, platformName: keyof typeof iosBuildPlatforms = 'simulator') {
   const iosFolder = path.join(getProjectRootDir(), 'ios')
   const workspacePath = path.join(iosFolder, `${appName}.xcworkspace`)
   const buildFlavor = getIosFlavors(buildType)
@@ -59,7 +59,7 @@ function _buildIos(buildType: string, platformName: keyof typeof iosBuildPlatfor
 
 }
 
-export function buildIos(buildType: string, platformName: keyof typeof iosBuildPlatforms) {
+export function buildIos(buildType?: string, platformName: keyof typeof iosBuildPlatforms = 'simulator') {
   installPods()
   _buildIos(buildType, platformName)
 }

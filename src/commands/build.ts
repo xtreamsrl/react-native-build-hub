@@ -16,7 +16,7 @@ export default class Build extends Command {
     ios: Flags.boolean({char: 'i', description: 'Generate ios native build'}),
     android: Flags.boolean({char: 'a', description: 'Generate android native build'}),
     all: Flags.boolean({description: 'Generate both ios and android native build'}),
-    flavor: Flags.string({char: 'f', description: 'Specify flavor to build', default:'dev'}),
+    flavor: Flags.string({char: 'f', description: 'Specify flavor to build'}),
   }
 
   static args = {

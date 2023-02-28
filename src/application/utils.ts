@@ -8,7 +8,7 @@ export function executeCommand(command: string, options?: ExecSyncOptionsWithBuf
 }
 
 export function getRootDestinationFolder() {
-  return path.join(getProjectRootDir(), 'app_builds')
+  return path.join(getProjectRootDir(), '.rn-incremental')
 }
 
 export function getProjectRootDir() {
@@ -24,7 +24,18 @@ export function getAppName() {
   return packageJson.name
 }
 
-export function sleep(ms :number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+export function getRootModuleDir() {
+  return path.join(__dirname, '..', '..')
+}
+
+export function getApkToolExecutable() {
+  return path.join(getRootModuleDir(), 'apktool')
+}
+
+export function getUberSignJava() {
+  return path.join(getRootModuleDir(), 'uber-apk-signer.jar')
+}

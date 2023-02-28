@@ -37,7 +37,7 @@ function checkBuildPresent(buildType?: string) {
   return fs.existsSync(appPath)
 }
 
-function findBestApkInFolder(dir: string, arc?: string) {
+export function findBestApkInFolder(dir: string, arc?: string) {
 
   const files = fs.readdirSync(dir)
   // todo debug

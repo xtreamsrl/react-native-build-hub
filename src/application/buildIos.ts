@@ -28,8 +28,6 @@ function _buildIos(buildType?: string, platformName: keyof typeof iosBuildPlatfo
       -scheme "${buildFlavor.scheme}" \
       -configuration ${buildFlavor.config} \
       -sdk ${platform.name} \
-      -archivePath '${archivePath}' \
-      -derivedDataPath ${iosFolder}/DerivedData/${appName} \
       ${platform.buildCmd}
     `
 

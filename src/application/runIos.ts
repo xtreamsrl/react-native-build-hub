@@ -51,8 +51,7 @@ function installApp(
     target,
     buildType,
   )
-
-  childProcess.execSync(`xcrun simctl install ${deviceUdid} ${destination}`)
+  executeCommand(`xcrun simctl install ${deviceUdid} ${destination}`)
 }
 
 function launchApp(deviceUid: string, bundleId: string) {
@@ -84,7 +83,7 @@ export async function runApp(buildType?: string) {
 
   const buildFlavor = getIosFlavors(buildType)
 
-  // todo run on phisical devices
+  // todo run on phisycal devices
   if (!checkBuildPresent(getProjectRootDir(), buildFlavor.scheme, iosBuildPlatforms.simulator)) {
     buildIos(buildType as any, 'simulator')
   }
@@ -104,10 +103,8 @@ export async function runApp(buildType?: string) {
   } else {
     const requestedDevices = await promptForDeviceSelection(devices)
 
-    console.log(requestedDevices)
     for (const requestedDevice of requestedDevices) {
       if (!(requestedDevice.state === 'Booted')) {
-        console.log(requestedDevice)
 
         launchDevice(requestedDevice.udid)
       }

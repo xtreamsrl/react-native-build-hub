@@ -1,12 +1,12 @@
 import path from 'path'
-import {getAppName, getProjectRootDir} from './utils'
+import {getAppName, getProjectRootDir, getRootDestinationFolder} from './utils'
 import fs from 'fs'
 
-const configFileName = 'rn-enginerc.json'
+const configFileName = 'rn-incrementalrc.json'
 
 export type Config = {
-  ios: {
-    flavors: {
+  ios?: {
+    flavors?: {
       [key: string]: {
         scheme: string;
         config: string;
@@ -26,13 +26,6 @@ export type Config = {
 function getDefaultConfig(): Config {
   return {
     ios: {
-      flavors: {
-        dev: {
-          scheme: getAppName(),
-          config: 'Debug',
-          flavorDir: 'Debug',
-        },
-      },
     },
     android: {
       flavors: {
@@ -46,6 +39,11 @@ function getDefaultConfig(): Config {
 
 export function loadConfig() {
   const configPath = path.join(getProjectRootDir(), configFileName)
+  const destinationFolder = getRootDestinationFolder();
+
+  if(!fs.existsSync(destinationFolder)) {
+    fs.mkdirSync(destinationFolder);
+  }
 
   if (fs.existsSync(configPath)) {
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
@@ -66,7 +64,16 @@ export function getIosFlavors(flavorName?: string) {
       flavorDir: getAppName(),
     }
   }
-  return config.ios.flavors[flavorName]
+  const flavorConfig = config?.ios?.flavors?.[flavorName];
+  if (flavorConfig) {
+    return flavorConfig
+  } else {
+    return {
+      scheme: flavorName,
+      config: 'Debug',
+      flavorDir: flavorName,
+    }
+  }
 }
 
 export function getAndroidFlavors(flavorName?: string) {

@@ -2,9 +2,14 @@ import process from 'process'
 import fs from 'fs'
 import path from 'path'
 import {execSync, ExecSyncOptionsWithBufferEncoding} from 'child_process'
-
+const util = require('util');
+const execAsync = util.promisify(require('child_process').exec);
 export function executeCommand(command: string, options?: ExecSyncOptionsWithBufferEncoding) {
   execSync(command, {stdio: 'inherit', ...(options || {})})
+}
+
+export function executeCommandAsync(command: string, options?: ExecSyncOptionsWithBufferEncoding) {
+  return execAsync(command, options);
 }
 
 export function getRootDestinationFolder() {

@@ -2,8 +2,7 @@ import {Args, Command, Flags} from '@oclif/core'
 import {runApp as runAndroid} from '../application/runAndroid'
 import {runApp as runIos} from '../application/runIos'
 import {startMetro, checkIsMetroRunning} from '../application/metroManager'
-import loadConfig from '@react-native-community/cli-config'
-import {getProjectRootDir} from '../application/utils'
+import logger from '../application/logger'
 
 export default class Run extends Command {
   static description = 'Run the native app'
@@ -16,6 +15,7 @@ export default class Run extends Command {
     android: Flags.boolean({char: 'a', description: 'Run the android app'}),
     ios: Flags.boolean({char: 'i', description: 'Run the ios app'}),
     flavor: Flags.string({char: 'f', description: 'Specify flavor to build'}),
+    verbose: Flags.boolean({description: 'Verbose output'}),
   }
 
   static args = {
@@ -27,21 +27,27 @@ export default class Run extends Command {
 
     const shouldRunAndroid = flags.android ?? flags.all
     const shouldRunIos = flags.ios ?? flags.all
-    const buildFlavor = flags.flavor;
-    this.log('Checking if metro is running...');
+    const buildFlavor = flags.flavor
+    const verbose = flags.verbose
+    logger.setVerbose(flags.verbose)
+    const start = performance.now()
+    logger.info('Checking if metro is running...')
 
     const isMetroRunning = await checkIsMetroRunning()
     if (!isMetroRunning) {
-      this.log('Metro is not running. Starting Metro')
+      logger.info('Metro is not running. Starting Metro')
       await startMetro()
     }
+    logger.info('Metro is already running. Skipping start metro.')
 
     if (shouldRunAndroid) {
-      // todo build and appId
-      runAndroid(buildFlavor)
+      logger.info(`Running android app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`)
+      await runAndroid(buildFlavor)
     }
     if (shouldRunIos) {
-      runIos(buildFlavor!)
+      logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`)
+      await runIos(buildFlavor!)
     }
+    logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`)
   }
 }

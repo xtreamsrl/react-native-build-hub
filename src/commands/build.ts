@@ -32,6 +32,7 @@ export default class Build extends Command {
     const buildFlavor = flags.flavor
 
     this.log('Build app', getAppName())
+    const start = performance.now();
 
     if (shouldBuildIos) {
       this.log('Build ios')
@@ -40,7 +41,8 @@ export default class Build extends Command {
     if (shouldBuildAndroid) {
       this.log('Building android')
       // build release and debug?
-      buildAndroid(buildFlavor, flags.incremental)
+      await buildAndroid(buildFlavor, flags.incremental)
     }
+    this.log('Build finished in', (performance.now() - start) / 1000, 'seconds');
   }
 }

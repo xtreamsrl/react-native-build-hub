@@ -10,6 +10,7 @@ import tryLaunchEmulator from '@react-native-community/cli-platform-android/buil
 import {buildAndroid} from './buildAndroid'
 import {getAppBuildFolder} from './androidUtils'
 import path from 'path'
+import logger from './logger'
 
 function getAdbPath() {
   const androidHome = process.env.ANDROID_HOME
@@ -105,9 +106,13 @@ function getBundleIdentifier(appBuildFolder: string): string {
 export async function runApp(buildType?: string, port = '8081') {
 
   if (!checkBuildPresent(buildType)) {
-    buildAndroid(buildType)
+    logger.info('Build not present, starting build');
+    await buildAndroid(buildType)
+  }else {
+    logger.info('Build already present, skipping build');
   }
 
+  // todo improvement: if there is only one device, use it directly
   const device = await listAndroidDevices()
 
   const appIdentifier = getBundleIdentifier(getAppBuildFolder(buildType))
@@ -124,10 +129,8 @@ export async function runApp(buildType?: string, port = '8081') {
     } else {
       const newEmulatorPort = await getAvailableDevicePort()
       const emulator = `emulator-${newEmulatorPort}`
-      console.info('Launching emulator...')
       const result = await tryLaunchEmulator(getAdbPath(), device.readableName, newEmulatorPort)
       if (result.success) {
-        console.info('Successfully launched emulator.')
         tryRunAdbReverse(port, emulator)
 
         installApp(emulator, getProjectRootDir(), buildType)

@@ -4,9 +4,10 @@ import prompts from 'prompts'
 import chalk from 'chalk'
 import {executeCommand, getAppName, getProjectRootDir} from './utils'
 import {buildIos} from './buildIos'
-import {getIosBuildDestination, iosBuildPlatforms} from './iosUtils'
+import {getIosBuildDestination, iosBuildPlatforms, IosPlatform} from './iosUtils'
 import path from 'path'
 import {getIosFlavors} from './config'
+import logger from './logger'
 
 // todo default app name improve passing from command line
 
@@ -24,13 +25,11 @@ function getDevices(): Device[] {
   return Object.values(devicesJson.devices).flat() as Device[]
 }
 
-function getBootedDevicesIds(allDevices: Device[]) {
-  const bootedDevices = allDevices.filter(d => d.state === 'Booted')
-  return bootedDevices
+function getBootedDevices(allDevices: Device[]) {
+  return allDevices.filter(d => d.state === 'Booted');
 }
 
 function checkBuildPresent(
-  engineDir: string,
   buildType: string,
   target: any,
 ) {
@@ -43,7 +42,6 @@ function checkBuildPresent(
 
 function installApp(
   deviceUdid: string,
-  engineDir: string,
   buildType: string,
   target: any,
 ) {
@@ -79,22 +77,27 @@ async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]>
   return devices
 }
 
-export async function runApp(buildType?: string) {
+export async function runApp(buildType?: string, iosPlatform: IosPlatform = iosBuildPlatforms.simulator) {
 
   const buildFlavor = getIosFlavors(buildType)
 
-  // todo run on phisycal devices
-  if (!checkBuildPresent(getProjectRootDir(), buildFlavor.scheme, iosBuildPlatforms.simulator)) {
-    buildIos(buildType as any, 'simulator')
+  if (!checkBuildPresent(buildFlavor.scheme, iosPlatform)) {
+    logger.info('Build not present, starting build');
+    buildIos(buildType, iosPlatform)
+  } else {
+    logger.info('Build already present, skipping build');
   }
 
   const devices = getDevices()
 
   if (devices.length === 0) {
-    throw new Error('No iOS devices available')
+    throw new Error('No iOS devices available');
   }
 
-  let bootedDevices = getBootedDevicesIds(devices)
+  // todo improve run on device
+  executeCommand('open -a Simulator');
+
+  let bootedDevices = getBootedDevices(devices);
 
   const devicesToRun: Device[] = []
 
@@ -105,7 +108,6 @@ export async function runApp(buildType?: string) {
 
     for (const requestedDevice of requestedDevices) {
       if (!(requestedDevice.state === 'Booted')) {
-
         launchDevice(requestedDevice.udid)
       }
     }
@@ -114,22 +116,19 @@ export async function runApp(buildType?: string) {
 
   }
 
-  // todo improve run on device
-  executeCommand('open -a Simulator')
-
   const {destination} = getIosBuildDestination(
     iosBuildPlatforms.simulator,
     buildFlavor.scheme,
   )
 
   const bundleID = execFileSync('/usr/libexec/PlistBuddy', ['-c', 'Print:CFBundleIdentifier', path.join(destination, 'Info.plist')], {
-    encoding: 'utf8'
-  }).trim();
+    encoding: 'utf8',
+  }).trim()
 
   for (const device of devicesToRun) {
     const id = device.udid
-    installApp(id, getProjectRootDir(), buildFlavor.scheme, iosBuildPlatforms.simulator)
-    launchApp(id, bundleID);
+    installApp(id, buildFlavor.scheme, iosBuildPlatforms.simulator)
+    launchApp(id, bundleID)
   }
 
 }

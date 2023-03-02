@@ -6,11 +6,11 @@ Windows android support work in progress
 
 | Feature                            | Android | iOS |
 |------------------------------------| :---: | :---: |
-| Run on device                      | ✅| ✅ |
-| Run on emulator                    | ✅ | ✅ |
-| Debug build                        | ✅ | ✅ |
-| Build flavor/variants              | ✅ | ✅ |
-| Release build                      | ✅ | 🚧 |
-| Sign application                   | ✅ | 🚧 |
-| Incremental build                  | ✅| 🚧 |
+| Run on emulator                    | 🚧 | ✅ |
+| Run on device                      | 🚧| 🚧 |
+| Debug build                        | 🚧 | 🚧 |
+| Build flavor/variants              | 🚧 | 🚧 |
+| Release build                      | 🚧 | 🚧 |
+| Sign application                   | 🚧 | 🚧 |
+| Incremental build                  | 🚧| 🚧 |
 | Reversioning of incremental builds | 🚧 | 🚧 |

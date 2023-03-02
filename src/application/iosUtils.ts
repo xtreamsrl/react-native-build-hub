@@ -14,6 +14,12 @@ export const iosBuildPlatforms = {
 };
 
 
+export type IosPlatform = {
+  name: string;
+  ext: string;
+  buildCmd: string;
+}
+
 
 export function getIosBuildDestination(platform: { ext: string; buildCmd: string; name: string }, buildType: string) {
   // todo handle Debug/release

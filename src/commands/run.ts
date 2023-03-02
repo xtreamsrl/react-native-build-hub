@@ -3,6 +3,7 @@ import {runApp as runAndroid} from '../application/runAndroid'
 import {runApp as runIos} from '../application/runIos'
 import {startMetro, checkIsMetroRunning} from '../application/metroManager'
 import logger from '../application/logger'
+import {iosBuildPlatforms} from '../application/iosUtils'
 
 export default class Run extends Command {
   static description = 'Run the native app'
@@ -28,7 +29,7 @@ export default class Run extends Command {
     const shouldRunAndroid = flags.android ?? flags.all
     const shouldRunIos = flags.ios ?? flags.all
     const buildFlavor = flags.flavor
-    const verbose = flags.verbose
+
     logger.setVerbose(flags.verbose)
     const start = performance.now()
     logger.info('Checking if metro is running...')
@@ -46,7 +47,7 @@ export default class Run extends Command {
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`)
-      await runIos(buildFlavor!)
+      await runIos(buildFlavor!, iosBuildPlatforms.simulator)
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`)
   }

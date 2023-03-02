@@ -1,7 +1,7 @@
 import path from 'path'
 import {executeCommand, getAppName, getProjectRootDir, getRootDestinationFolder} from './utils'
 import {ux} from '@oclif/core'
-import {getIosBuildDestination, iosBuildPlatforms} from './iosUtils'
+import {getIosBuildDestination, iosBuildPlatforms, IosPlatform} from './iosUtils'
 import {getIosFlavors} from './config'
 
 const appName = getAppName()
@@ -12,14 +12,13 @@ function installPods() {
   executeCommand('pod install', {cwd: iosFolder})
 }
 
-function _buildIos(buildType?: string, platformName: keyof typeof iosBuildPlatforms = 'simulator') {
+function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms.simulator) {
   const iosFolder = path.join(getProjectRootDir(), 'ios')
   const workspacePath = path.join(iosFolder, `${appName}.xcworkspace`)
   const buildFlavor = getIosFlavors(buildType)
   if (!buildFlavor) {
     throw new Error(`No build flavor found for ${buildType}`)
   }
-  const platform = iosBuildPlatforms[platformName]
 
   const archivePath = `${iosFolder}/build/Products/${appName}.xcarchive`
 
@@ -57,7 +56,7 @@ function _buildIos(buildType?: string, platformName: keyof typeof iosBuildPlatfo
 
 }
 
-export function buildIos(buildType?: string, platformName: keyof typeof iosBuildPlatforms = 'simulator') {
+export function buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms.simulator) {
   installPods()
-  _buildIos(buildType, platformName)
+  _buildIos(buildType, platform)
 }

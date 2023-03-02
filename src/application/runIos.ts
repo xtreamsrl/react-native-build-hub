@@ -117,7 +117,7 @@ export async function runApp(buildType?: string, iosPlatform: IosPlatform = iosB
   }
 
   const {destination} = getIosBuildDestination(
-    iosBuildPlatforms.simulator,
+    iosPlatform,
     buildFlavor.scheme,
   )
 
@@ -127,7 +127,7 @@ export async function runApp(buildType?: string, iosPlatform: IosPlatform = iosB
 
   for (const device of devicesToRun) {
     const id = device.udid
-    installApp(id, buildFlavor.scheme, iosBuildPlatforms.simulator)
+    installApp(id, buildFlavor.scheme, iosPlatform)
     launchApp(id, bundleID)
   }
 

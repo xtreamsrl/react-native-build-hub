@@ -2,6 +2,7 @@ import {Args, Command, Flags} from '@oclif/core'
 import {buildIos} from '../application/buildIos'
 import {buildAndroid} from '../application/buildAndroid'
 import {getAppName} from '../application/utils'
+import {iosBuildPlatforms} from '../application/iosUtils'
 
 export default class Build extends Command {
   static description = 'Create native builds for android and ios'
@@ -36,7 +37,7 @@ export default class Build extends Command {
 
     if (shouldBuildIos) {
       this.log('Build ios')
-      buildIos(buildFlavor, 'simulator')
+      buildIos(buildFlavor, iosBuildPlatforms.simulator)
     }
     if (shouldBuildAndroid) {
       this.log('Building android')

@@ -6,10 +6,10 @@ Windows android support work in progress
 
 | Feature                            | Android | iOS |
 |------------------------------------| :---: | :---: |
-| Run on emulator                    | 🚧 | ✅ |
+| Run on emulator                    | ✅ | ✅ |
 | Run on device                      | 🚧| 🚧 |
 | Debug build                        | 🚧 | 🚧 |
-| Build flavor/variants              | 🚧 | 🚧 |
+| Build flavor/schema                | ✅ | ✅ |
 | Release build                      | 🚧 | 🚧 |
 | Sign application                   | 🚧 | 🚧 |
 | Incremental build                  | 🚧| 🚧 |

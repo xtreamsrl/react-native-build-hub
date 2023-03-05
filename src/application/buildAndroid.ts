@@ -8,11 +8,11 @@ import {
   getUberSignJava,
 } from './utils';
 import { getAndroidFlavors } from './config';
-import { getAppBuildFolder } from './androidUtils';
+import { getAndroidIndexJsPath, getAppBuildFolder } from "./androidUtils";
 import fs from 'fs';
 
 function capitalize(str: string) {
-  return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 async function rebuildIncrementallyTheApk(
@@ -78,7 +78,7 @@ async function rebuildIncrementally(buildType: string | undefined) {
     `node ./node_modules/react-native/cli.js bundle \
     --platform android \
     --dev false \
-    --entry-file index.js \
+    --entry-file ${getAndroidIndexJsPath()} \
     --bundle-output ${bundleOutput} \
     --assets-dest ${resOutput}`,
     { cwd: getProjectRootDir() },

@@ -42,6 +42,6 @@ export default class Build extends Command {
       logger.info('Building android');
       await buildAndroid(buildFlavor, incremental, release);
     }
-    logger.info(`Build finished in ${(performance.now() - start) / 1000} seconds`);
+    logger.info(`Build finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
   }
 }

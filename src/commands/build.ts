@@ -1,8 +1,8 @@
-import {Args, Command, Flags} from '@oclif/core'
+import {Command, Flags} from '@oclif/core'
 import {buildIos} from '../application/buildIos'
 import {buildAndroid} from '../application/buildAndroid'
-import {getAppName} from '../application/utils'
 import {iosBuildPlatforms} from '../application/iosUtils'
+import logger from '../application/logger'
 
 export default class Build extends Command {
   static description = 'Create native builds for android and ios'
@@ -10,40 +10,38 @@ export default class Build extends Command {
   static examples = [
     '<%= config.bin %> <%= command.id %> -i -f=dev',
     '<%= config.bin %> <%= command.id %> -a -f=prod',
-    '<%= config.bin %> <%= command.id %> -all',
+    '<%= config.bin %> <%= command.id %> -a -f=prod --release',
+    '<%= config.bin %> <%= command.id %> -a --release',
+    '<%= config.bin %> <%= command.id %> -a --incremental',
   ]
 
   static flags = {
     ios: Flags.boolean({char: 'i', description: 'Generate ios native build'}),
     android: Flags.boolean({char: 'a', description: 'Generate android native build'}),
-    all: Flags.boolean({description: 'Generate both ios and android native build'}),
     flavor: Flags.string({char: 'f', description: 'Specify flavor to build'}),
+    release: Flags.boolean({description: 'Optimized release build'}),
     incremental: Flags.boolean({char: 'I', description: 'Incremental build', default: false}),
   }
 
-  static args = {
-    file: Args.string({description: 'file to read'}),
-  }
-
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(Build)
+    const {flags} = await this.parse(Build)
 
-    const shouldBuildAndroid = flags.android ?? flags.all
-    const shouldBuildIos = flags.ios ?? flags.all
+    const shouldBuildAndroid = flags.android;
+    const shouldBuildIos = flags.ios;
     const buildFlavor = flags.flavor
+    const release = flags.release;
+    const incremental = flags.incremental;
 
-    this.log('Build app', getAppName())
     const start = performance.now();
 
     if (shouldBuildIos) {
-      this.log('Build ios')
+      logger.info('Building ios app')
       buildIos(buildFlavor, iosBuildPlatforms.simulator)
     }
     if (shouldBuildAndroid) {
-      this.log('Building android')
-      // build release and debug?
-      await buildAndroid(buildFlavor, flags.incremental)
+      logger.info('Building android')
+      await buildAndroid(buildFlavor, incremental, release)
     }
-    this.log('Build finished in', (performance.now() - start) / 1000, 'seconds');
+    logger.info(`Build finished in ${(performance.now() - start) / 1000} seconds`);
   }
 }

@@ -1,8 +1,8 @@
 import path from 'path'
 import {
-  executeCommand, executeCommandAsync,
+  executeCommand,
+  executeCommandAsync,
   getApkToolExecutable,
-  getAppName,
   getProjectRootDir,
   getRootDestinationFolder,
   getUberSignJava,
@@ -10,11 +10,9 @@ import {
 import {getAndroidFlavors} from './config'
 import {getAppBuildFolder} from './androidUtils'
 import fs from 'fs'
-import {findBestApkInFolder} from './runAndroid'
-import {channelAWSDir} from 'oclif/lib/upload-util'
 
 function capitalize(str: string) {
-  return str
+  return str;
 }
 
 async function rebuildIncrementallyTheApk(apkPath: string, bundleOutput: string, resOutput: string, tempAssetBundle: string) {
@@ -77,11 +75,10 @@ async function rebuildIncrementally(buildType: string | undefined) {
     --dev false \
     --entry-file index.js \
     --bundle-output ${bundleOutput} \
-    --assets-dest ${resOutput}`, {cwd: getProjectRootDir()});
-
+    --assets-dest ${resOutput}`, {cwd: getProjectRootDir()})
 
   await Promise.all(fs.readdirSync(getAppBuildFolder(buildType)).filter(f => f.endsWith('.apk')).map(async apkFileName => {
-    console.log(`rebuilding ${apkFileName}`);
+    console.log(`rebuilding ${apkFileName}`)
     if (apkFileName.endsWith('.apk')) {
       const apkPath = path.join(getAppBuildFolder(buildType), apkFileName)
 
@@ -91,33 +88,38 @@ async function rebuildIncrementally(buildType: string | undefined) {
 
 }
 
-export async function buildAndroid(buildType?: string, incrementalBuild: boolean = false) {
-  // todo improve flavor management with debug and release and no flavor usage
-  const buildFlavor = getAndroidFlavors(buildType)
+function getBuildTask(gradleFlavor: string | undefined, release: boolean) {
+  const buildType = release ? 'Release' : 'Debug'
+  const gradleBuildTask = (gradleFlavor && gradleFlavor !== 'debug') ? `assemble${capitalize(gradleFlavor)}${buildType}` : `assemble${buildType}`
+  return gradleBuildTask
+}
+
+export async function buildAndroid(flavorName: string | undefined, incrementalBuild: boolean = false, release: boolean = false) {
+  const buildFlavor = getAndroidFlavors(flavorName)
   if (!buildFlavor) {
-    throw new Error(`No android flavor found for ${buildType}`)
+    throw new Error(`No android flavor found for ${flavorName}`)
   }
   const {gradleFlavor} = buildFlavor
 
   const androidFolder = path.join(getProjectRootDir(), 'android')
-  // todo handle Debug/release
 
   if (incrementalBuild) {
     // todo check previous build existance
     // create a temp directory
-    await rebuildIncrementally(buildType)
+    await rebuildIncrementally(flavorName)
 
   } else {
-    const gradleBuildTask = (gradleFlavor && gradleFlavor !== 'debug') ? `install${capitalize(gradleFlavor)}Debug` : 'installDebug'
+    const gradleBuildTask = getBuildTask(gradleFlavor, release)
 
     executeCommand(`${androidFolder}/gradlew \
       -Duser.dir=${androidFolder} \
       app:${gradleBuildTask} \
     `, {stdio: 'inherit'})
 
-    const destinationDir = getAppBuildFolder(buildType)
+    const destinationDir = getAppBuildFolder(flavorName, release)
+    const buildType = release ? 'release' : 'debug'
     executeCommand(`rm -rf ${destinationDir} && mkdir -p ${destinationDir}`)
-    const destinationFlavorFolder = (gradleFlavor && gradleFlavor !== 'debug') ? `${gradleFlavor}/debug` : 'debug'
+    const destinationFlavorFolder = (gradleFlavor && gradleFlavor !== 'debug') ? `${gradleFlavor}/${buildType}` : buildType
     const gradleOutputDir = `${androidFolder}/app/build/outputs/apk/${destinationFlavorFolder}/`
     executeCommand(`cp -R ${gradleOutputDir} ${destinationDir}`)
   }

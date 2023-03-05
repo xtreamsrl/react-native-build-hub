@@ -30,7 +30,6 @@ function getBootedDevices() {
 
 function checkBuildPresent(buildType?: string) {
   const appPath = getAppBuildFolder(buildType);
-  console.debug('appPath', appPath);
   return fs.existsSync(appPath);
 }
 
@@ -91,6 +90,15 @@ function getBundleIdentifier(appBuildFolder: string): string {
   return 'todo';
 }
 
+function installAndLaunch(port: string, deviceId: string, buildType: string | undefined, appIdentifier: string) {
+  tryRunAdbReverse(port, deviceId);
+
+  logger.info('Installing app...');
+  installApp(deviceId, getProjectRootDir(), buildType);
+  logger.info('Launching app...');
+  launchApp(deviceId, appIdentifier);
+}
+
 export async function runApp(buildType?: string, port = '8081') {
   if (!checkBuildPresent(buildType)) {
     logger.info('Build not present, starting build');
@@ -108,19 +116,13 @@ export async function runApp(buildType?: string, port = '8081') {
     throw new Error('No android devices available');
   } else {
     if (device.connected) {
-      tryRunAdbReverse(port, device.deviceId!);
-
-      installApp(device.deviceId!, getProjectRootDir(), buildType);
-      launchApp(device.deviceId!, appIdentifier);
+      installAndLaunch(port, device.deviceId!, buildType, appIdentifier);
     } else {
       const newEmulatorPort = await getAvailableDevicePort();
       const emulator = `emulator-${newEmulatorPort}`;
       const result = await tryLaunchEmulator(getAdbPath(), device.readableName, newEmulatorPort);
       if (result.success) {
-        tryRunAdbReverse(port, emulator);
-
-        installApp(emulator, getProjectRootDir(), buildType);
-        launchApp(emulator, appIdentifier);
+        installAndLaunch(port, emulator, buildType, appIdentifier);
       }
     }
   }

@@ -8,7 +8,7 @@ import {
   getUberSignJava,
 } from './utils';
 import { getAndroidFlavors } from './config';
-import { getAndroidIndexJsPath, getAppBuildFolder } from "./androidUtils";
+import { getAndroidIndexJsPath, getAppBuildFolder } from './androidUtils';
 import fs from 'fs';
 
 function capitalize(str: string) {

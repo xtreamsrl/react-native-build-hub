@@ -8,7 +8,7 @@ Windows android support work in progress
 |------------------------------------| :---: | :---: |
 | Run on emulator                    | ✅ | ✅ |
 | Run on device                      | 🚧| 🚧 |
-| Debug build                        | 🚧 | 🚧 |
+| Debug build                        | ✅ | ✅ |
 | Build flavor/schema                | ✅ | ✅ |
 | Release build                      | 🚧 | 🚧 |
 | Sign application                   | 🚧 | 🚧 |

@@ -21,9 +21,28 @@ specific configuration. If you encounter any issues, please feel free to file an
 
 ## Credits
 
-This project is highly inspired by the React Native architecture articles by
-Wix (https://medium.com/wix-engineering/react-native-at-wix-the-architecture-ii-deep-dive-9cfcb3c2822c) and the related
-repo (https://github.com/wix-incubator/react-native-wix-engine).
+This project is highly inspired by the [React Native architecture articles by
+Wix](https://medium.com/wix-engineering/react-native-at-wix-the-architecture-ii-deep-dive-9cfcb3c2822c) and the [related
+repo](https://github.com/wix-incubator/react-native-wix-engine).
+
+## Requirements
+
+For more detailed information on setting up your development environment for Android and iOS, refer to the official [React Native documentation](https://reactnative.dev/docs/environment-setup).
+
+### Android
+- Java Development Kit
+- Android Studio
+- Android SDK
+- Environment variables
+  - JAVA_HOME
+  - ANDROID_HOME
+  - ANDROID_SDK_ROOT
+
+### iOS
+- A macOS machine with Xcode.
+- CocoaPods.
+- Xcode command line tools
+
 
 ## Installation
 

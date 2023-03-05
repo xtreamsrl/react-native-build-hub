@@ -36,8 +36,10 @@ export default class Run extends Command {
     if (!isMetroRunning) {
       logger.info('Metro is not running. Starting Metro');
       await startMetro();
+      logger.info('Metro started correctly');
+    } else {
+      logger.info('Metro is already running. Skipping metro start.');
     }
-    logger.info('Metro is already running. Skipping start metro.');
 
     if (shouldRunAndroid) {
       logger.info(`Running android app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);

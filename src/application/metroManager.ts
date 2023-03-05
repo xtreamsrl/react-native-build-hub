@@ -15,7 +15,6 @@ export async function startMetro(resetCache = false, port = '8081') {
   while (!(await checkIsMetroRunning(port))) {
     await sleep(100);
   }
-  console.log('Metro is running');
 }
 
 export async function checkIsMetroRunning(port = '8081') {

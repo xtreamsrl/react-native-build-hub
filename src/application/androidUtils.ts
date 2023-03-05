@@ -1,7 +1,8 @@
-import {getAppName, getRootDestinationFolder} from './utils'
+import {getRootDestinationFolder} from './utils'
 
-export function getAppBuildFolder(buildType?: string) {
-  // todo add debug
-  const appPath = `${getRootDestinationFolder()}/android/${buildType ? `${buildType}/` : ''}debug`
+export function getAppBuildFolder(flavorName?: string, release?: boolean) {
+  const buildType = release ? 'release' : 'debug'
+
+  const appPath = `${getRootDestinationFolder()}/android/${flavorName ? `${flavorName}/` : ''}${buildType}`
   return appPath
 }

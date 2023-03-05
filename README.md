@@ -14,6 +14,8 @@ repack it with the new JS bundle.
 For now, the developers should choose if the native build should be forced or not. In the future, the cli tool may
 add some heuristics to decide when to force the native build.
 
+![Run android with build cached](./docs/assets/run-android-build-cached.png)
+
 ## Disclaimer
 
 There are many configurations for native builds, and it's possible that this CLI does not support your
@@ -126,4 +128,6 @@ It just executes the following steps:
 * resign the app if necessary
 
 
-
+# Who we are
+<img align="left" width="80" height="80" src="https://avatars2.githubusercontent.com/u/38501645?s=450&u=1eb7348ca81f5cd27ce9c02e689f518d903852b1&v=4">
+A proudly 🇮🇹 software development and data science startup.<br>We consider ourselves a family of talented and passionate people building their own products and powerful solutions for our clients. Get to know us more on <a target="_blank" href="https://xtreamers.io">xtreamers.io</a> or follow us on <a target="_blank" href="https://it.linkedin.com/company/xtream-srl">LinkedIn</a>.

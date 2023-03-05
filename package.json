@@ -1,20 +1,25 @@
 {
-  "name": "react-native-engine",
-  "version": "0.0.0",
-  "description": "oclif example Hello World CLI",
+  "name": "@xtreamsrl/react-native-incremental-cli",
+  "version": "0.1.0",
+  "description": "React Native CLI that caches native builds and speedup your development and release cycle",
   "author": "Luca Micieli",
   "bin": {
-    "react-native-engine": "./bin/run"
+    "react-native-incremental": "./bin/run",
+    "rn-incremental": "./bin/run",
+    "rni": "./bin/run"
   },
-  "homepage": "https://github.com/xtreamsrl/react-native-engine",
+  "homepage": "https://github.com/xtreamsrl/react-native-incremental-cli",
   "license": "MIT",
   "main": "dist/index.js",
-  "repository": "xtreamsrl/react-native-engine",
+  "repository": "xtreamsrl/react-native-incremental-cli",
   "files": [
     "/bin",
     "/dist",
     "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
+    "/oclif.manifest.json",
+    "/apktool",
+    "/apktool.jar",
+    "/uber-apk-signer.jar"
   ],
   "dependencies": {
     "@oclif/core": "^2",

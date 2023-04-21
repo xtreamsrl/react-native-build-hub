@@ -7,7 +7,7 @@ import adb from '@react-native-community/cli-platform-android/build/commands/run
 import _getAdbPath from '@react-native-community/cli-platform-android/build/commands/runAndroid/getAdbPath';
 import tryLaunchEmulator from '@react-native-community/cli-platform-android/build/commands/runAndroid/tryLaunchEmulator';
 import { buildAndroid } from './buildAndroid';
-import { getAppBuildFolder } from './androidUtils';
+import { checkBuildPresent, getAppBuildFolder } from './androidUtils';
 import path from 'path';
 import logger from './logger';
 
@@ -26,11 +26,6 @@ async function getDevices() {
 function getBootedDevices() {
   const output = childProcess.execSync(`${getAdbPath()} devices | tail -n +2 | cut -sf 1`);
   return String(output).trim().split('\n');
-}
-
-function checkBuildPresent(buildType?: string) {
-  const appPath = getAppBuildFolder(buildType);
-  return fs.existsSync(appPath);
 }
 
 export function findBestApkInFolder(dir: string, arc?: string) {
@@ -99,10 +94,10 @@ function installAndLaunch(port: string, deviceId: string, buildType: string | un
   launchApp(deviceId, appIdentifier);
 }
 
-export async function runApp(buildType?: string, port = '8081') {
-  if (!checkBuildPresent(buildType)) {
+export async function runApp(buildFlavor?: string, port = '8081') {
+  if (!checkBuildPresent(buildFlavor)) {
     logger.info('Build not present, starting build');
-    await buildAndroid(buildType);
+    await buildAndroid(buildFlavor);
   } else {
     logger.info('Build already present, skipping build');
   }
@@ -110,19 +105,19 @@ export async function runApp(buildType?: string, port = '8081') {
   // todo improvement: if there is only one device, use it directly
   const device = await listAndroidDevices();
 
-  const appIdentifier = getBundleIdentifier(getAppBuildFolder(buildType));
+  const appIdentifier = getBundleIdentifier(getAppBuildFolder(buildFlavor));
 
   if (!device) {
     throw new Error('No android devices available');
   } else {
     if (device.connected) {
-      installAndLaunch(port, device.deviceId!, buildType, appIdentifier);
+      installAndLaunch(port, device.deviceId!, buildFlavor, appIdentifier);
     } else {
       const newEmulatorPort = await getAvailableDevicePort();
       const emulator = `emulator-${newEmulatorPort}`;
       const result = await tryLaunchEmulator(getAdbPath(), device.readableName, newEmulatorPort);
       if (result.success) {
-        installAndLaunch(port, emulator, buildType, appIdentifier);
+        installAndLaunch(port, emulator, buildFlavor, appIdentifier);
       }
     }
   }

@@ -27,6 +27,8 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
       -scheme "${buildFlavor.scheme}" \
       -configuration ${buildFlavor.config} \
       -sdk ${platform.name} \
+      -archivePath '${archivePath}' \
+      -derivedDataPath ${iosFolder}/DerivedData/${appName} \
       ${platform.buildCmd}
     `;
 
@@ -34,6 +36,7 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
 
   if (platform.buildCmd === 'build') {
     // todo handle Debug/release
+    // todo app name now is not right this must be "PRODUCT_NAME = "Bilty DEV";" inside the workspace
     const source = `${iosFolder}/DerivedData/${appName}/build/Products/Debug-${platform.name}/${appName}.${platform.ext}`;
     const { destinationDir, destination } = getIosBuildDestination(platform, buildFlavor.flavorDir);
 

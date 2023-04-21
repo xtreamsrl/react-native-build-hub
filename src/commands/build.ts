@@ -19,7 +19,7 @@ export default class Build extends Command {
     ios: Flags.boolean({ char: 'i', description: 'Generate ios native build' }),
     android: Flags.boolean({ char: 'a', description: 'Generate android native build' }),
     flavor: Flags.string({ char: 'f', description: 'Specify flavor to build' }),
-    release: Flags.boolean({ description: 'Optimized release build' }),
+    release: Flags.boolean({ description: 'Optimized release build', default: false }),
     incremental: Flags.boolean({ char: 'I', description: 'Incremental build', default: false }),
   };
 

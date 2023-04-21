@@ -34,15 +34,33 @@ function checkBuildPresent(buildType: string, target: any) {
 
 function installApp(deviceUdid: string, buildType: string, target: any) {
   const { destination } = getIosBuildDestination(target, buildType);
-  executeCommand(`xcrun simctl install ${deviceUdid} ${destination}`);
+  const res = childProcess.execSync(`xcrun simctl install ${deviceUdid} ${destination}`, { encoding: 'utf-8' });
+  console.log('res', res);
 }
 
 function launchApp(deviceUid: string, bundleId: string) {
   childProcess.execSync(`xcrun simctl launch ${deviceUid} ${bundleId}`);
 }
 
+function isErrorWithStderr(e: unknown): e is { stderr: { toString(): string } } {
+  if (typeof e === 'object' && e !== null && 'stderr' in e) {
+    return typeof (e as any).stderr.toString === 'function';
+  }
+  return false;
+}
+
 function launchDevice(deviceUid: string) {
-  executeCommand(['xcrun', 'simctl', 'boot', deviceUid].join(' '));
+  try {
+    childProcess.execSync(['xcrun', 'simctl', 'boot', deviceUid].join(' '));
+  } catch (e) {
+    if (isErrorWithStderr(e)) {
+      const err = e.stderr.toString();
+      if (err.includes('Unable to boot device in current state: Booted')) {
+        return;
+      }
+    }
+    throw e;
+  }
 }
 
 async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]> {

@@ -8,8 +8,9 @@ import {
   getUberSignJava,
 } from './utils';
 import { getAndroidFlavors } from './config';
-import { getAndroidIndexJsPath, getAppBuildFolder } from './androidUtils';
+import { checkBuildPresent, getAndroidIndexJsPath, getAppBuildFolder } from './androidUtils';
 import fs from 'fs';
+import logger from './logger';
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -64,7 +65,7 @@ async function rebuildIncrementallyTheApk(
   await executeCommandAsync(`cp ${signedApkPath} ${apkPath}`);
 }
 
-async function rebuildIncrementally(buildType: string | undefined) {
+async function rebuildIncrementally(buildType: string | undefined, release: boolean = false) {
   const tempRNBundleDir = `${getRootDestinationFolder()}/tmp_${(Math.random() * 1000).toFixed(0)}`;
 
   const tempAssetBundle = path.join(tempRNBundleDir, 'bundle_output');
@@ -74,6 +75,7 @@ async function rebuildIncrementally(buildType: string | undefined) {
   fs.mkdirSync(tempAssetBundle, { recursive: true });
   fs.mkdirSync(tempAssetBundle, { recursive: true });
 
+  logger.info('Creating new bundle and assets');
   executeCommand(
     `node ./node_modules/react-native/cli.js bundle \
     --platform android \
@@ -83,15 +85,17 @@ async function rebuildIncrementally(buildType: string | undefined) {
     --assets-dest ${resOutput}`,
     { cwd: getProjectRootDir() },
   );
+  logger.info('Rebuilding apks');
+
+  const buildFolder = getAppBuildFolder(buildType, release);
 
   await Promise.all(
     fs
-      .readdirSync(getAppBuildFolder(buildType))
+      .readdirSync(buildFolder)
       .filter(f => f.endsWith('.apk'))
       .map(async apkFileName => {
-        console.log(`rebuilding ${apkFileName}`);
         if (apkFileName.endsWith('.apk')) {
-          const apkPath = path.join(getAppBuildFolder(buildType), apkFileName);
+          const apkPath = path.join(buildFolder, apkFileName);
 
           return rebuildIncrementallyTheApk(apkPath, bundleOutput, resOutput, tempAssetBundle);
         }
@@ -122,9 +126,13 @@ export async function buildAndroid(
   const androidFolder = path.join(getProjectRootDir(), 'android');
 
   if (incrementalBuild) {
-    // todo check previous build existance
+    if (!checkBuildPresent(flavorName, release)) {
+      throw new Error(
+        `No build found for ${flavorName} ${release ? 'release' : 'debug'}. Unable to do incremental build`,
+      );
+    }
     // create a temp directory
-    await rebuildIncrementally(flavorName);
+    await rebuildIncrementally(flavorName, release);
   } else {
     const gradleBuildTask = getBuildTask(gradleFlavor, release);
 

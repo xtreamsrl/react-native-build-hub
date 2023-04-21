@@ -1,7 +1,7 @@
 import path from 'path';
 import { executeCommand, getAppName, getProjectRootDir, getRootDestinationFolder } from './utils';
 import { ux } from '@oclif/core';
-import { getIosBuildDestination, iosBuildPlatforms, IosPlatform } from './iosUtils';
+import { getBuildFolder, getIosBuildDestination, iosBuildPlatforms, IosPlatform } from './iosUtils';
 import { getIosFlavors } from './config';
 
 const appName = getAppName();
@@ -36,8 +36,8 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
 
   if (platform.buildCmd === 'build') {
     // todo handle Debug/release
-    // todo app name now is not right this must be "PRODUCT_NAME = "Bilty DEV";" inside the workspace
-    const source = `${iosFolder}/DerivedData/${appName}/build/Products/Debug-${platform.name}/${appName}.${platform.ext}`;
+    const appFolder = getBuildFolder(getAppName(), false, buildFlavor.flavorDir, platform.name);
+    const source = `${iosFolder}/DerivedData/${appName}/build/Products/Debug-${platform.name}/${appFolder}`;
     const { destinationDir, destination } = getIosBuildDestination(platform, buildFlavor.flavorDir);
 
     executeCommand(`mkdir -p ${destinationDir}`);

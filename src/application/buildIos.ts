@@ -60,6 +60,6 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
 }
 
 export function buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms.simulator) {
-  installPods();
+  // installPods();
   _buildIos(buildType, platform);
 }

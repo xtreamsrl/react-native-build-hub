@@ -94,8 +94,8 @@ function installAndLaunch(port: string, deviceId: string, buildType: string | un
   launchApp(deviceId, appIdentifier);
 }
 
-export async function runApp(buildFlavor?: string, port = '8081') {
-  if (!checkBuildPresent(buildFlavor)) {
+export async function runApp(buildFlavor?: string, port = '8081', forceBuild?: boolean) {
+  if (forceBuild || !checkBuildPresent(buildFlavor)) {
     logger.info('Build not present, starting build');
     await buildAndroid(buildFlavor);
   } else {

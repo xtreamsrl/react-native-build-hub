@@ -79,10 +79,14 @@ async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]>
   return devices;
 }
 
-export async function runApp(buildType?: string, iosPlatform: IosPlatform = iosBuildPlatforms.simulator) {
+export async function runApp(
+  buildType?: string,
+  iosPlatform: IosPlatform = iosBuildPlatforms.simulator,
+  forceBuild?: boolean,
+) {
   const buildFlavor = getIosFlavors(buildType);
 
-  if (!checkBuildPresent(buildFlavor.scheme, iosPlatform)) {
+  if (forceBuild || !checkBuildPresent(buildFlavor.scheme, iosPlatform)) {
     logger.info('Build not present, starting build');
     buildIos(buildType, iosPlatform);
   } else {

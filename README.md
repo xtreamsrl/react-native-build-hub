@@ -72,7 +72,7 @@ npx rn-incremental run [-a|-i] [-f|--flavor flavor] [--force-build]
 - `-i/--ios`: run on iOS
 - `-a/--android`: run on Android
 - `-f/--flavor`: specify the flavor/schema
-- `--force-build/-fb`: force a native build
+- `--force-build`: force a native build
 
 ### Build
 

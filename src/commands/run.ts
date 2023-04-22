@@ -13,8 +13,9 @@ export default class Run extends Command {
   static flags = {
     android: Flags.boolean({ char: 'a', description: 'Run the android app' }),
     ios: Flags.boolean({ char: 'i', description: 'Run the ios app' }),
-    flavor: Flags.string({ char: 'f', description: 'Specify flavor to build' }),
+    flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
+    forceBuild: Flags.boolean({ aliases: ['fb', 'force-build'], description: 'Force a native rebuild' }),
   };
 
   static args = {
@@ -27,6 +28,7 @@ export default class Run extends Command {
     const shouldRunAndroid = flags.android ?? flags.all;
     const shouldRunIos = flags.ios ?? flags.all;
     const buildFlavor = flags.flavor;
+    const forceBuild = flags.forceBuild;
 
     logger.setVerbose(flags.verbose);
     const start = performance.now();
@@ -43,11 +45,11 @@ export default class Run extends Command {
 
     if (shouldRunAndroid) {
       logger.info(`Running android app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runAndroid(buildFlavor);
+      await runAndroid(buildFlavor, undefined, forceBuild);
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runIos(buildFlavor!, iosBuildPlatforms.simulator);
+      await runIos(buildFlavor!, iosBuildPlatforms.simulator, forceBuild);
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
   }

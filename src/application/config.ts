@@ -23,19 +23,6 @@ export type Config = {
   };
 };
 
-function getDefaultConfig(): Config {
-  return {
-    ios: {},
-    android: {
-      flavors: {
-        dev: {
-          gradleFlavor: 'debug',
-        },
-      },
-    },
-  };
-}
-
 export function loadConfig() {
   const configPath = path.join(getProjectRootDir(), configFileName);
   const destinationFolder = getRootDestinationFolder();
@@ -47,8 +34,6 @@ export function loadConfig() {
   if (fs.existsSync(configPath)) {
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     return config as Config;
-  } else {
-    return getDefaultConfig();
   }
 }
 

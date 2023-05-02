@@ -31,9 +31,9 @@ function getBootedDevices() {
 export function findBestApkInFolder(dir: string, arc?: string) {
   const files = fs.readdirSync(dir);
   // todo debug
-  const singleApkFound = files.find(f => f === 'app-debug.apk');
+  const singleApkFound = files.find(f => f.endsWith('.apk'));
   if (singleApkFound) {
-    return path.join(dir, 'app-debug.apk');
+    return path.join(dir, singleApkFound);
   } else {
     if (arc) {
       const apkForArc = files.find(f => f.includes(arc));

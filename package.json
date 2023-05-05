@@ -1,6 +1,6 @@
 {
   "name": "@xtreamsrl/react-native-incremental-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React Native CLI that caches native builds and speedup your development and release cycle",
   "author": "Luca Micieli",
   "bin": {

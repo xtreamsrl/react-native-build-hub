@@ -154,3 +154,12 @@ export async function signIn() {
     openOauthLogin();
   });
 }
+
+export async function checkAuth() {
+  try {
+    await restoreUser();
+  } catch (ex) {
+    console.log('Failed to restore user', ex);
+    await signIn();
+  }
+}

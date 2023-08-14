@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { doc, collection, addDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
+import { getDoc, doc, collection, addDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getRootDestinationFolder } from '../utils';
 import logger from '../logger';
@@ -17,7 +17,7 @@ export async function createProject(name: string): Promise<string> {
 }
 
 export async function saveProjectData(name: string, id: string) {
-  fs.writeFileSync(path.join(getRootDestinationFolder(), 'project.json'), JSON.stringify({ name, id }));
+  fs.writeFileSync(path.join(getRootDestinationFolder(), 'project.json'), JSON.stringify({ name, id }, null, 2));
 }
 
 export async function checkProject(): Promise<ProjectData> {
@@ -27,6 +27,11 @@ export async function checkProject(): Promise<ProjectData> {
     const projectData = JSON.parse(fs.readFileSync(path.join(getRootDestinationFolder(), 'project.json'), 'utf-8'));
     return projectData;
   }
+}
+
+export async function getAvailableProjects(): Promise<ProjectData[]> {
+  const user = await getDoc(doc(getFirestore(), 'users', getAuth().currentUser!.uid));
+  return user.data()?.projects ?? [];
 }
 
 export type ProjectData = {

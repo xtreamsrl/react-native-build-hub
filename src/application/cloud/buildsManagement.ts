@@ -18,7 +18,7 @@ import {
 import { ref, getStorage, uploadBytesResumable, StorageReference, getBytes } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 import AdmZip from 'adm-zip';
-import { getRootDestinationFolder } from '../utils';
+import { capitalize, getRootDestinationFolder } from '../utils';
 import logger from '../logger';
 
 export type Build = {
@@ -177,8 +177,8 @@ export async function downloadBuild(buildId: string): Promise<void> {
       buildId,
       'ios',
       `${buildInfo.device}-${buildInfo.flavor}`,
-      buildInfo.type.toUpperCase(),
-    ); // todo capitalize
+      capitalize(buildInfo.type),
+    );
 
     await unzipFile(tempZipPath, destinationFolder);
     fs.rmSync(tempZipPath);

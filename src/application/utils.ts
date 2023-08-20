@@ -49,3 +49,7 @@ export function getApkToolExecutable() {
 export function getUberSignJava() {
   return path.join(getRootModuleDir(), 'uber-apk-signer.jar');
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

@@ -2,24 +2,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import {
-  setDoc,
-  getDocs,
-  collection,
   addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
   getFirestore,
-  serverTimestamp,
-  where,
+  limit,
   orderBy,
   query,
-  limit,
-  getDoc,
-  doc,
+  serverTimestamp,
+  setDoc,
+  where,
 } from 'firebase/firestore';
-import { ref, getStorage, uploadBytesResumable, StorageReference, getBytes } from 'firebase/storage';
+import { getBytes, getStorage, ref, StorageReference, uploadBytesResumable } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 import AdmZip from 'adm-zip';
 import { capitalize, getBuildFolderByBuildId, getRootDestinationFolder } from '../utils';
 import logger from '../logger';
+import { iosBuildPlatforms } from '../iosUtils';
 
 export type Build = {
   device: 'all' | 'iphonesimulator';
@@ -50,10 +51,15 @@ async function zipFolder(folderPath: string, outputZipPath: string) {
   return newZip.writeZipPromise(outputZipPath);
 }
 
-async function upload(fileRef: StorageReference, buffer: Buffer) {
+function clearLastLine() {
+  process.stdout.moveCursor(0, -1); // up one line
+  process.stdout.clearLine(1); // from cursor to end
+}
+
+async function upload(fileRef: StorageReference, buffer: Buffer, filename: string) {
   return new Promise((resolve, reject) => {
-    logger.debug(`byte length read ${Buffer.byteLength(buffer)}`);
     const uploadTask = uploadBytesResumable(fileRef, buffer);
+    process.stdout.write('\n');
 
     uploadTask.on(
       'state_changed',
@@ -61,7 +67,8 @@ async function upload(fileRef: StorageReference, buffer: Buffer) {
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        logger.debug('Upload is ' + progress + '% done');
+        clearLastLine();
+        logger.info(`Upload of ${filename} is ${progress.toFixed(0)}% done`);
         switch (snapshot.state) {
           case 'paused':
             logger.debug('Upload is paused');
@@ -94,6 +101,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], p
   const tempBuildsFolder = path.join(getRootDestinationFolder(), 'temp_builds', buildId);
   fs.mkdirSync(tempBuildsFolder, { recursive: true });
   const rootBuildsFolder = `projects/${projectId}/builds/${buildId}`;
+  logger.info(`Found ${androidBuilds.length} android builds and ${iosBuilds.length} ios builds`);
   // todo improve parallelism
   for (const buildInfo of [...androidBuilds, ...iosBuilds]) {
     const fileName = `${buildInfo.device}-${buildInfo.flavor}-${buildInfo.type}.zip`;
@@ -102,7 +110,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], p
     logger.debug(`Zipping ${buildInfo.path} to ${tempZipPath}`);
     await zipFolder(buildInfo.path, tempZipPath);
     logger.debug(`Uploading ${tempZipPath} to ${fileRef.fullPath}`);
-    await upload(fileRef, new AdmZip(tempZipPath).toBuffer());
+    await upload(fileRef, new AdmZip(tempZipPath).toBuffer(), fileName);
     logger.debug(`Uploaded ${tempZipPath} to ${fileRef.fullPath}`);
     buildInfo.path = fileRef.fullPath;
   }
@@ -114,8 +122,10 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], p
     },
     { merge: true },
   );
+  logger.info(`Builds created successfully. Build id: ${buildId}`);
 
-  // fs.rmSync(tempBuildsFolder, { recursive: true });
+  fs.rmSync(tempBuildsFolder, { recursive: true });
+  return buildId;
 }
 
 export async function getLastBuild(projectId: string): Promise<ProjectBuildDoc> {
@@ -157,6 +167,7 @@ async function downloadZipBuild(buildInfo: Build, buildId: string) {
 export async function downloadBuild(buildId: string): Promise<void> {
   const buildInfoDoc = await getDoc(doc(getFirestore(), 'builds', buildId));
   const build = buildInfoDoc.data() as ProjectBuildDoc;
+  logger.info(`Found ${build.androidBuilds.length} android builds and ${build.iosBuilds.length} ios builds`);
   // todo improve parallelism
   for (const buildInfo of build.androidBuilds) {
     const tempZipPath = await downloadZipBuild(buildInfo, buildId);
@@ -190,4 +201,45 @@ export async function makeCurrentBuild(buildId: string) {
     fs.rmSync(iosPath, { recursive: true });
   }
   fs.cpSync(getBuildFolderByBuildId(buildId), getRootDestinationFolder(), { recursive: true });
+}
+
+export function getAvailableCurrentBuilds() {
+  const androidBuilds: Build[] = [];
+  const androidFolder = path.join(getRootDestinationFolder(), 'android');
+  if (fs.existsSync(androidFolder)) {
+    const flavorsFolders = fs.readdirSync(androidFolder);
+    for (const flavorFolder of flavorsFolders) {
+      const debugBuildPath = path.join(androidFolder, flavorFolder, 'debug');
+      if (fs.existsSync(debugBuildPath)) {
+        androidBuilds.push({
+          device: 'all',
+          flavor: flavorFolder,
+          release: false,
+          debug: true,
+          type: 'debug',
+          path: debugBuildPath,
+        });
+      }
+    }
+  }
+  const iosBuilds: Build[] = [];
+  const iosFolder = path.join(getRootDestinationFolder(), 'ios');
+  if (fs.existsSync(iosFolder)) {
+    const flavorsFolders = fs.readdirSync(iosFolder);
+    for (const flavorFolder of flavorsFolders) {
+      const [deviceType, ...flavor] = flavorFolder.split('-');
+      const debugBuildPath = path.join(iosFolder, flavorFolder, 'Debug');
+      if (fs.existsSync(debugBuildPath) && deviceType === iosBuildPlatforms.simulator.name) {
+        iosBuilds.push({
+          device: 'iphonesimulator',
+          flavor: flavor.join('-'),
+          release: false,
+          debug: true,
+          type: 'debug',
+          path: debugBuildPath,
+        });
+      }
+    }
+  }
+  return { androidBuilds, iosBuilds };
 }

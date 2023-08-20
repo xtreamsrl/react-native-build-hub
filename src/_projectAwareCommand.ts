@@ -1,9 +1,9 @@
 import { Command } from '@oclif/core';
 import { checkAuth } from './application/cloud/auth';
-import { checkProject, ProjectData } from './application/cloud/projectsManagement';
+import { checkProject, ProjectData, ProjectFileSchema } from './application/cloud/projectsManagement';
 
 export default abstract class ProjectAwareCommand extends Command {
-  currentProject: ProjectData = {
+  currentProject: ProjectFileSchema = {
     get id(): string {
       throw new Error('select a project');
     },

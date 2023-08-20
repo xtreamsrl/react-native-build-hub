@@ -1,10 +1,6 @@
-import path from 'node:path';
-import fs from 'node:fs';
-
-import { iosBuildPlatforms } from '../application/iosUtils';
 import ProjectAwareCommand from '../_projectAwareCommand';
-import { getRootDestinationFolder } from '../application/utils';
-import { Build, uploadBuilds } from '../application/cloud/buildsManagement';
+import { getAvailableCurrentBuilds, uploadBuilds } from '../application/cloud/buildsManagement';
+import { updateCurrentBuildInFile } from '../application/cloud/projectsManagement';
 
 export default class UploadBuild extends ProjectAwareCommand {
   static description = 'Save current android and ios builds to the cloud';
@@ -14,45 +10,10 @@ export default class UploadBuild extends ProjectAwareCommand {
   static aliases = ['build:upload'];
 
   public async run(): Promise<void> {
-    const androidBuilds: Build[] = [];
-    const androidFolder = path.join(getRootDestinationFolder(), 'android');
-    if (fs.existsSync(androidFolder)) {
-      const flavorsFolders = fs.readdirSync(androidFolder);
-      for (const flavorFolder of flavorsFolders) {
-        const debugBuildPath = path.join(androidFolder, flavorFolder, 'debug');
-        if (fs.existsSync(debugBuildPath)) {
-          androidBuilds.push({
-            device: 'all',
-            flavor: flavorFolder,
-            release: false,
-            debug: true,
-            type: 'debug',
-            path: debugBuildPath,
-          });
-        }
-      }
-    }
-    const iosBuilds: Build[] = [];
-    const iosFolder = path.join(getRootDestinationFolder(), 'ios');
-    if (fs.existsSync(iosFolder)) {
-      const flavorsFolders = fs.readdirSync(iosFolder);
-      for (const flavorFolder of flavorsFolders) {
-        const [deviceType, ...flavor] = flavorFolder.split('-');
-        const debugBuildPath = path.join(iosFolder, flavorFolder, 'Debug');
-        if (fs.existsSync(debugBuildPath) && deviceType === iosBuildPlatforms.simulator.name) {
-          iosBuilds.push({
-            device: 'iphonesimulator',
-            flavor: flavor.join('-'),
-            release: false,
-            debug: true,
-            type: 'debug',
-            path: debugBuildPath,
-          });
-        }
-      }
-    }
+    const { androidBuilds, iosBuilds } = getAvailableCurrentBuilds();
 
-    await uploadBuilds(androidBuilds, iosBuilds, this.currentProject.id);
+    const buildId = await uploadBuilds(androidBuilds, iosBuilds, this.currentProject.id);
+    await updateCurrentBuildInFile(buildId);
     this.exit(0);
   }
 }

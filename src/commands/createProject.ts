@@ -26,5 +26,6 @@ export default class CreateProject extends AuthenticatedCommand {
       const id = await createProject(projectName);
       await saveProjectData(projectName, id);
     }
+    this.exit(0);
   }
 }

@@ -1,5 +1,7 @@
 import { Command } from '@oclif/core';
 import { restoreUser, signIn } from '../application/cloud/auth';
+import logger from '../application/logger';
+import { getAuth } from 'firebase/auth';
 
 export default class Login extends Command {
   static description = 'Login to use cloud services';
@@ -8,8 +10,8 @@ export default class Login extends Command {
     try {
       await restoreUser();
     } catch (ex) {
-      console.log('Failed to restore user', ex);
       await signIn();
     }
+    logger.info(`Logged in as ${getAuth().currentUser!.email}`);
   }
 }

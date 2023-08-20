@@ -9,6 +9,7 @@ import './firebase';
 import { getAuth, GoogleAuthProvider, signInWithCredential, User } from 'firebase/auth';
 import { getRootDestinationFolder } from '../utils';
 import { UserImpl } from '@firebase/auth/internal';
+import logger from '../logger';
 
 function fetchWithFormData(url: string, formData: string): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -68,7 +69,6 @@ export async function restoreUser() {
     await getAuth().updateCurrentUser(user);
 
     await getAuth().currentUser?.reload();
-    console.log('userCredential', user);
   } else {
     throw new Error('No tokens found');
   }
@@ -89,7 +89,6 @@ async function handleLoginWithCode(code: string, res: http.ServerResponse, serve
     .then(data => {
       if (data.id_token) {
         const idToken = data.id_token;
-        console.log('Received ID token:', idToken);
 
         // Build Firebase credential with the Google ID token.
         const credential = GoogleAuthProvider.credential(idToken);
@@ -98,7 +97,6 @@ async function handleLoginWithCode(code: string, res: http.ServerResponse, serve
         const auth = getAuth();
         signInWithCredential(auth, credential)
           .then(userCredential => {
-            console.log('userCredential', userCredential);
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(`<html><head></head><body>Signed in, go back to the cli</body></html>`);
             server.close();
@@ -116,11 +114,11 @@ async function handleLoginWithCode(code: string, res: http.ServerResponse, serve
             // ...
           });
       } else {
-        console.error('Error fetching ID token:', data.error);
+        logger.error('Error fetching ID token:', data.error);
       }
     })
     .catch((error: any) => {
-      console.error('Error fetching ID token:', error.message);
+      logger.error('Error fetching ID token:', error.message);
     });
 }
 

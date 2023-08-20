@@ -16,6 +16,7 @@ export default class Run extends Command {
     flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
     forceBuild: Flags.boolean({ aliases: ['fb', 'force-build'], description: 'Force a native rebuild' }),
+    buildId: Flags.string({ description: 'Specify the build id. Can be local, last or a buildId', default: 'local' }),
   };
 
   static args = {
@@ -29,6 +30,7 @@ export default class Run extends Command {
     const shouldRunIos = flags.ios ?? flags.all;
     const buildFlavor = flags.flavor;
     const forceBuild = flags.forceBuild;
+    const buildId = flags.buildId;
 
     logger.setVerbose(flags.verbose);
     const start = performance.now();

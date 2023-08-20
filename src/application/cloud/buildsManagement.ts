@@ -1,9 +1,23 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import archiver from 'archiver';
-import { setDoc, doc, collection, addDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
-import { ref, getStorage, uploadBytes, uploadBytesResumable, StorageReference } from 'firebase/storage';
+
+import {
+  setDoc,
+  getDocs,
+  collection,
+  addDoc,
+  getFirestore,
+  serverTimestamp,
+  where,
+  orderBy,
+  query,
+  limit,
+  getDoc,
+  doc,
+} from 'firebase/firestore';
+import { ref, getStorage, uploadBytesResumable, StorageReference, getBytes } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
+import AdmZip from 'adm-zip';
 import { getRootDestinationFolder } from '../utils';
 import logger from '../logger';
 
@@ -16,34 +30,29 @@ export type Build = {
   path: string;
 };
 
-async function zipFolder(folderPath: string, outputZipPath: string) {
-  const folderAbsolutePath = path.resolve(folderPath);
+export type ProjectBuildDoc = {
+  id: string;
+  projectId: string;
+  androidBuilds: Build[];
+  iosBuilds: Build[];
+  createdAt: string;
+  createdBy: string;
+  version: string;
+};
 
-  if (!fs.existsSync(folderAbsolutePath)) {
+async function zipFolder(folderPath: string, outputZipPath: string) {
+  if (!fs.existsSync(folderPath)) {
     console.error(`The folder "${folderPath}" does not exist.`);
     return;
   }
-
-  const output = fs.createWriteStream(outputZipPath);
-  const archive = archiver('zip', {
-    zlib: { level: 9 }, // Compression level (0 to 9)
-  });
-
-  output.on('close', function () {
-    console.log(`Folder "${folderPath}" zipped to "${outputZipPath}" successfully.`);
-  });
-
-  archive.on('error', function (err) {
-    console.error('Error creating zip archive:', err);
-  });
-
-  archive.pipe(output);
-  archive.directory(folderAbsolutePath, false);
-  return archive.finalize();
+  const newZip = new AdmZip();
+  newZip.addLocalFolder(folderPath);
+  return newZip.writeZipPromise(outputZipPath);
 }
 
 async function upload(fileRef: StorageReference, buffer: Buffer) {
   return new Promise((resolve, reject) => {
+    logger.debug(`byte length read ${Buffer.byteLength(buffer)}`);
     const uploadTask = uploadBytesResumable(fileRef, buffer);
 
     uploadTask.on(
@@ -92,7 +101,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], p
     logger.debug(`Zipping ${buildInfo.path} to ${tempZipPath}`);
     await zipFolder(buildInfo.path, tempZipPath);
     logger.debug(`Uploading ${tempZipPath} to ${fileRef.fullPath}`);
-    await upload(fileRef, fs.readFileSync(tempZipPath));
+    await upload(fileRef, new AdmZip(tempZipPath).toBuffer());
     logger.debug(`Uploaded ${tempZipPath} to ${fileRef.fullPath}`);
     buildInfo.path = fileRef.fullPath;
   }
@@ -105,5 +114,73 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], p
     { merge: true },
   );
 
-  fs.rmSync(tempBuildsFolder, { recursive: true });
+  // fs.rmSync(tempBuildsFolder, { recursive: true });
+}
+
+export async function getLastBuild(projectId: string): Promise<ProjectBuildDoc> {
+  const lastBuild = await getDocs(
+    query(
+      collection(getFirestore(), 'builds'),
+      where('projectId', '==', projectId),
+      orderBy('createdAt', 'desc'),
+      limit(1),
+    ),
+  );
+  return { ...(lastBuild.docs[0].data() as ProjectBuildDoc), id: lastBuild.docs[0].id } as ProjectBuildDoc;
+}
+
+function unzipFile(zipFilePath: string, destinationFolder: string): void {
+  const zip = new AdmZip(zipFilePath);
+
+  // Ensure the destination folder exists
+  if (!fs.existsSync(destinationFolder)) {
+    fs.mkdirSync(destinationFolder, { recursive: true });
+  }
+
+  zip.extractAllTo(destinationFolder, true);
+
+  console.log(`File extracted to ${destinationFolder}`);
+}
+
+async function downloadZipBuild(buildInfo: Build, buildId: string) {
+  const fileRef = ref(getStorage(), buildInfo.path);
+  const tempZipPath = path.join(getRootDestinationFolder(), 'temp_builds', buildId, path.basename(buildInfo.path));
+  logger.debug(`Downloading ${fileRef.fullPath} to ${tempZipPath}`);
+  const fileBuffer = await getBytes(fileRef);
+  fs.mkdirSync(path.dirname(tempZipPath), { recursive: true });
+  fs.writeFileSync(tempZipPath, Buffer.from(fileBuffer));
+  logger.debug(`Downloaded ${fileRef.fullPath} to ${tempZipPath}`);
+  return tempZipPath;
+}
+
+export async function downloadBuild(buildId: string): Promise<void> {
+  const buildInfoDoc = await getDoc(doc(getFirestore(), 'builds', buildId));
+  const build = buildInfoDoc.data() as ProjectBuildDoc;
+  for (const buildInfo of build.androidBuilds) {
+    const tempZipPath = await downloadZipBuild(buildInfo, buildId);
+    const destinationFolder = path.join(
+      getRootDestinationFolder(),
+      'builds',
+      buildId,
+      'android',
+      buildInfo.flavor,
+      buildInfo.type,
+    );
+    await unzipFile(tempZipPath, destinationFolder);
+    fs.rmSync(tempZipPath);
+  }
+  for (const buildInfo of build.iosBuilds) {
+    const tempZipPath = await downloadZipBuild(buildInfo, buildId);
+    const destinationFolder = path.join(
+      getRootDestinationFolder(),
+      'builds',
+      buildId,
+      'ios',
+      `${buildInfo.device}-${buildInfo.flavor}`,
+      buildInfo.type.toUpperCase(),
+    ); // todo capitalize
+
+    await unzipFile(tempZipPath, destinationFolder);
+    fs.rmSync(tempZipPath);
+  }
 }

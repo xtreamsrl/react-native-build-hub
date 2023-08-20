@@ -50,6 +50,10 @@ export function getUberSignJava() {
   return path.join(getRootModuleDir(), 'uber-apk-signer.jar');
 }
 
+export function getBuildFolderByBuildId(buildId: string) {
+  return path.join(getRootDestinationFolder(), 'builds', buildId);
+}
+
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }

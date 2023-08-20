@@ -26,5 +26,6 @@ export default class DownloadBuild extends ProjectAwareCommand {
     }
     logger.info(`Downloading build ${buildIdToDownload}`);
     await downloadBuild(buildIdToDownload);
+    this.exit(0);
   }
 }

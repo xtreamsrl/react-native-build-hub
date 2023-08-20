@@ -17,7 +17,14 @@ export async function createProject(name: string): Promise<string> {
 }
 
 export async function saveProjectData(name: string, id: string) {
-  fs.writeFileSync(path.join(getRootDestinationFolder(), 'project.json'), JSON.stringify({ name, id }, null, 2));
+  const projectData: ProjectData = { name, id, currentBuildId: null };
+  fs.writeFileSync(path.join(getRootDestinationFolder(), 'project.json'), JSON.stringify(projectData, null, 2));
+}
+
+export async function updateCurrentBuildInFile(buildId: string | null) {
+  const projectData = await checkProject();
+  projectData.currentBuildId = buildId;
+  fs.writeFileSync(path.join(getRootDestinationFolder(), 'project.json'), JSON.stringify(projectData, null, 2));
 }
 
 export async function checkProject(): Promise<ProjectData> {
@@ -37,4 +44,5 @@ export async function getAvailableProjects(): Promise<ProjectData[]> {
 export type ProjectData = {
   name: string;
   id: string;
+  currentBuildId: string | null;
 };

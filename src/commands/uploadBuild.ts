@@ -41,7 +41,7 @@ export default class UploadBuild extends ProjectAwareCommand {
         const debugBuildPath = path.join(iosFolder, flavorFolder, 'Debug');
         if (fs.existsSync(debugBuildPath) && deviceType === iosBuildPlatforms.simulator.name) {
           iosBuilds.push({
-            device: 'iphoneSimulator',
+            device: 'iphonesimulator',
             flavor: flavor.join('-'),
             release: false,
             debug: true,

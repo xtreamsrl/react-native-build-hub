@@ -10,6 +10,9 @@ export default abstract class ProjectAwareCommand extends Command {
     get name(): string {
       throw new Error('select a project');
     },
+    get currentBuildId(): string | null {
+      throw new Error('select a project');
+    },
   };
 
   protected init(): Promise<any> {

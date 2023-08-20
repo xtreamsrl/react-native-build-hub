@@ -18,11 +18,11 @@ import {
 import { ref, getStorage, uploadBytesResumable, StorageReference, getBytes } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 import AdmZip from 'adm-zip';
-import { capitalize, getRootDestinationFolder } from '../utils';
+import { capitalize, getBuildFolderByBuildId, getRootDestinationFolder } from '../utils';
 import logger from '../logger';
 
 export type Build = {
-  device: 'all' | 'iphoneSimulator';
+  device: 'all' | 'iphonesimulator';
   flavor: string;
   release: boolean;
   debug: boolean;
@@ -94,6 +94,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], p
   const tempBuildsFolder = path.join(getRootDestinationFolder(), 'temp_builds', buildId);
   fs.mkdirSync(tempBuildsFolder, { recursive: true });
   const rootBuildsFolder = `projects/${projectId}/builds/${buildId}`;
+  // todo improve parallelism
   for (const buildInfo of [...androidBuilds, ...iosBuilds]) {
     const fileName = `${buildInfo.device}-${buildInfo.flavor}-${buildInfo.type}.zip`;
     const fileRef = ref(getStorage(), `${rootBuildsFolder}/${fileName}`);
@@ -156,16 +157,10 @@ async function downloadZipBuild(buildInfo: Build, buildId: string) {
 export async function downloadBuild(buildId: string): Promise<void> {
   const buildInfoDoc = await getDoc(doc(getFirestore(), 'builds', buildId));
   const build = buildInfoDoc.data() as ProjectBuildDoc;
+  // todo improve parallelism
   for (const buildInfo of build.androidBuilds) {
     const tempZipPath = await downloadZipBuild(buildInfo, buildId);
-    const destinationFolder = path.join(
-      getRootDestinationFolder(),
-      'builds',
-      buildId,
-      'android',
-      buildInfo.flavor,
-      buildInfo.type,
-    );
+    const destinationFolder = path.join(getBuildFolderByBuildId(buildId), 'android', buildInfo.flavor, buildInfo.type);
     await unzipFile(tempZipPath, destinationFolder);
     fs.rmSync(tempZipPath);
   }
@@ -183,4 +178,16 @@ export async function downloadBuild(buildId: string): Promise<void> {
     await unzipFile(tempZipPath, destinationFolder);
     fs.rmSync(tempZipPath);
   }
+}
+
+export async function makeCurrentBuild(buildId: string) {
+  const androidPath = path.join(getRootDestinationFolder(), 'android');
+  if (fs.existsSync(androidPath)) {
+    fs.rmSync(androidPath, { recursive: true });
+  }
+  const iosPath = path.join(getRootDestinationFolder(), 'ios');
+  if (fs.existsSync(iosPath)) {
+    fs.rmSync(iosPath, { recursive: true });
+  }
+  fs.cpSync(getBuildFolderByBuildId(buildId), getRootDestinationFolder(), { recursive: true });
 }

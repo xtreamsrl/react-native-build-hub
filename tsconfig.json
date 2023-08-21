@@ -3,7 +3,7 @@
     "declaration": true,
     "importHelpers": true,
     "module": "commonjs",
-    "outDir": "dist",
+    "outDir": "build",
     "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,

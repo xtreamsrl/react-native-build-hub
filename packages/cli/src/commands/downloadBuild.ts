@@ -1,9 +1,9 @@
-import ProjectAwareCommand from '../_projectAwareCommand';
+import RemoteAwareCommand from '../_projectAwareCommand';
 import { downloadBuild, getLastBuild } from '../application/cloud/buildsManagement';
 import { Flags } from '@oclif/core';
 import logger from '../application/logger';
 
-export default class DownloadBuild extends ProjectAwareCommand {
+export default class DownloadBuild extends RemoteAwareCommand {
   static description = 'Download all the binary of the given build';
 
   static examples = ['<%= config.bin %> <%= command.id %>'];
@@ -19,13 +19,13 @@ export default class DownloadBuild extends ProjectAwareCommand {
     const buildId = flags.buildId;
     let buildIdToDownload: string;
     if (buildId === 'last') {
-      const build = await getLastBuild(this.currentProject.id);
-      buildIdToDownload = build.id;
+      const buildId = await getLastBuild(this.currentProject);
+      buildIdToDownload = buildId;
     } else {
       buildIdToDownload = buildId;
     }
     logger.info(`Downloading build ${buildIdToDownload}`);
-    await downloadBuild(buildIdToDownload);
+    await downloadBuild(buildIdToDownload, this.currentProject);
     this.exit(0);
   }
 }

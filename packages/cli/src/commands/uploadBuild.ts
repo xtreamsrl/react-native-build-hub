@@ -1,8 +1,8 @@
-import ProjectAwareCommand from '../_projectAwareCommand';
+import RemoteAwareCommand from '../_projectAwareCommand';
 import { getAvailableCurrentBuilds, uploadBuilds } from '../application/cloud/buildsManagement';
 import { updateCurrentBuildInFile } from '../application/cloud/projectsManagement';
 
-export default class UploadBuild extends ProjectAwareCommand {
+export default class UploadBuild extends RemoteAwareCommand {
   static description = 'Save current android and ios builds to the cloud';
 
   static examples = ['<%= config.bin %> <%= command.id %>'];
@@ -12,7 +12,7 @@ export default class UploadBuild extends ProjectAwareCommand {
   public async run(): Promise<void> {
     const { androidBuilds, iosBuilds } = getAvailableCurrentBuilds();
 
-    const buildId = await uploadBuilds(androidBuilds, iosBuilds, this.currentProject.id);
+    const buildId = await uploadBuilds(androidBuilds, iosBuilds, this.currentProject);
     await updateCurrentBuildInFile(buildId);
     this.exit(0);
   }

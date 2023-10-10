@@ -22,6 +22,8 @@
     "/uber-apk-signer.jar"
   ],
   "dependencies": {
+    "@azure/identity": "^3.3.1",
+    "@azure/storage-blob": "^12.16.0",
     "@firebase/auth": "^1.1.0",
     "@oclif/core": "^2",
     "@oclif/plugin-help": "^5",

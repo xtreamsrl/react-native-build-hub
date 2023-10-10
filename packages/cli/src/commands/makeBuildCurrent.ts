@@ -1,12 +1,33 @@
 import fs from 'node:fs';
-import ProjectAwareCommand from '../_projectAwareCommand';
+import RemoteAwareCommand from '../_projectAwareCommand';
 import { downloadBuild, getLastBuild, makeCurrentBuild } from '../application/cloud/buildsManagement';
 import { Flags } from '@oclif/core';
 import logger from '../application/logger';
 import { getBuildFolderByBuildId } from '../application/utils';
-import { updateCurrentBuildInFile } from '../application/cloud/projectsManagement';
+import { ProjectConfiguration, updateCurrentBuildInFile } from "../application/cloud/projectsManagement";
 
-export default class MakeBuildCurrent extends ProjectAwareCommand {
+export async function updateCurrentBuild(buildId: string, config: ProjectConfiguration) {
+  let buildIdToDownload: string;
+
+  if (buildId === "last") {
+    const buildId = await getLastBuild(config);
+    buildIdToDownload = buildId;
+  } else {
+    buildIdToDownload = buildId;
+  }
+  logger.info(`Downloading build ${buildIdToDownload}`);
+  if (fs.existsSync(getBuildFolderByBuildId(buildIdToDownload))) {
+    logger.info(`Build ${buildIdToDownload} already downloaded`);
+  } else {
+    await downloadBuild(buildIdToDownload, config);
+  }
+
+  await makeCurrentBuild(buildIdToDownload);
+
+  await updateCurrentBuildInFile(buildIdToDownload);
+}
+
+export default class MakeBuildCurrent extends RemoteAwareCommand {
   static description = 'Make a give build the current one, if not present it will be downloaded';
 
   static examples = ['<%= config.bin %> <%= command.id %>'];
@@ -20,23 +41,9 @@ export default class MakeBuildCurrent extends ProjectAwareCommand {
   public async run(): Promise<void> {
     const { flags } = await this.parse(MakeBuildCurrent);
     const buildId = flags.buildId;
-    let buildIdToDownload: string;
-    if (buildId === 'last') {
-      const build = await getLastBuild(this.currentProject.id);
-      buildIdToDownload = build.id;
-    } else {
-      buildIdToDownload = buildId;
-    }
-    logger.info(`Downloading build ${buildIdToDownload}`);
-    if (fs.existsSync(getBuildFolderByBuildId(buildIdToDownload))) {
-      logger.info(`Build ${buildIdToDownload} already downloaded`);
-    } else {
-      await downloadBuild(buildIdToDownload);
-    }
 
-    await makeCurrentBuild(buildIdToDownload);
-
-    await updateCurrentBuildInFile(buildIdToDownload);
+    const config = this.currentProject;
+    await updateCurrentBuild(buildId, config);
 
     this.exit(0);
   }

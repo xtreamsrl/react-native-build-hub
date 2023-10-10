@@ -2,12 +2,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getDoc, doc, collection, addDoc, getFirestore, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { getRootDestinationFolder } from '../utils';
+import { getConfigFile, getRootDestinationFolder } from '../utils';
 import logger from '../logger';
 
 export type ProjectFileSchema = {
   name: string;
   id: string;
+  currentBuildId: string | null;
+};
+
+type RemoteAdapterName = 'azure' | (string & {});
+
+export type RemoteAdapterConfig = {
+  name: RemoteAdapterName;
+  config: object;
+};
+
+export type ProjectConfiguration = {
+  remoteAdapter: RemoteAdapterConfig;
+  // this should not stay at project level because it indicates the build that the user has locally
   currentBuildId: string | null;
 };
 
@@ -42,11 +55,12 @@ export async function updateCurrentBuildInFile(buildId: string | null) {
   fs.writeFileSync(path.join(getRootDestinationFolder(), 'project.json'), JSON.stringify(projectData, null, 2));
 }
 
-export async function checkProject(): Promise<ProjectFileSchema> {
-  if (!fs.existsSync(path.join(getRootDestinationFolder(), 'project.json'))) {
+export async function checkProject(): Promise<ProjectConfiguration> {
+  if (!fs.existsSync(getConfigFile())) {
     throw new Error('No project found. Please select or create a project first');
   } else {
-    const projectData = JSON.parse(fs.readFileSync(path.join(getRootDestinationFolder(), 'project.json'), 'utf-8'));
+    // todo validate with zod or similar
+    const projectData = JSON.parse(fs.readFileSync(getConfigFile(), 'utf-8'));
     return projectData;
   }
 }

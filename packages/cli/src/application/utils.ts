@@ -2,6 +2,8 @@ import process from 'process';
 import fs from 'fs';
 import path from 'path';
 import { execSync, ExecSyncOptions, ExecSyncOptionsWithBufferEncoding } from 'child_process';
+import { ProjectConfiguration } from './cloud/projectsManagement';
+import { AzureHubAdapter } from '../adapters/azure';
 
 const util = require('util');
 const execAsync = util.promisify(require('child_process').exec);
@@ -19,10 +21,15 @@ export function executeCommandAsync(command: string, options?: ExecSyncOptionsWi
 }
 
 export function getRootDestinationFolder() {
-  return path.join(getProjectRootDir(), '.rn-incremental');
+  return path.join(getProjectRootDir(), '.rn-build-hub');
+}
+
+export function getConfigFile() {
+  return path.join(getProjectRootDir(), '.rn-build-hub.json');
 }
 
 export function getProjectRootDir() {
+  // todo improve this
   return process.cwd();
 }
 
@@ -56,4 +63,9 @@ export function getBuildFolderByBuildId(buildId: string) {
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function getAdapter(config: ProjectConfiguration) {
+  // todo select from configuration and import dynamically
+  return new AzureHubAdapter(config.remoteAdapter.config);
 }

@@ -54,5 +54,6 @@ export default class Run extends Command {
       await runIos(buildFlavor!, iosBuildPlatforms.simulator, forceBuild);
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
+    this.exit(0);
   }
 }

@@ -15,5 +15,6 @@ export default class AddUserToProject extends AuthenticatedCommand {
     const { args, flags } = await this.parse(AddUserToProject);
 
     // todo
+    this.exit(0);
   }
 }

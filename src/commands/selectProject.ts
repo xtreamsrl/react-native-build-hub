@@ -27,7 +27,7 @@ export default class SelectProject extends AuthenticatedCommand {
     if (selectedProject.project) {
       logger.info(`Selected project ${chalk.bold(selectedProject.project.name)} (${selectedProject.project.id})`);
       await saveProjectData(selectedProject.project.name, selectedProject.project.id);
-      this.exit(0);
     }
+    this.exit(0);
   }
 }

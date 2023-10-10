@@ -5,7 +5,7 @@ import fs from 'fs';
 export function getAppBuildFolder(flavorName?: string, release?: boolean) {
   const buildType = release ? 'release' : 'debug';
 
-  const appPath = `${getRootDestinationFolder()}/android/${flavorName ? `${flavorName}/` : ''}${buildType}`;
+  const appPath = `${getRootDestinationFolder()}/android/${flavorName ? `${flavorName}/` : 'default/'}${buildType}`;
   return appPath;
 }
 

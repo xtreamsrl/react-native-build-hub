@@ -13,5 +13,6 @@ export default class Login extends Command {
       await signIn();
     }
     logger.info(`Logged in as ${getAuth().currentUser!.email}`);
+    this.exit(0);
   }
 }

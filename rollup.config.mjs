@@ -15,7 +15,6 @@ function javascriptObfuscator(options = {}) {
     name: "javascript-obfuscator",
     transform(code, id) {
       const obfuscationResult = JavaScriptObfuscator.obfuscate(code, options);
-      console.log("obfuscating...");
       let result = { code: obfuscationResult.getObfuscatedCode() };
 
       if (options.sourceMap && options.sourceMapMode !== "inline") {
@@ -57,7 +56,7 @@ export default {
       deadCodeInjectionThreshold: 1,
       debugProtection: true,
       debugProtectionInterval: 4000,
-      disableConsoleOutput: true,
+      disableConsoleOutput: false,
       identifierNamesGenerator: 'hexadecimal',
       log: false,
       numbersToExpressions: true,

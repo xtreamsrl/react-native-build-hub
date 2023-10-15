@@ -1,5 +1,5 @@
 {
-  "name": "@rnbh/azure-blob-storage-hub",
+  "name": "@rn-buildhub/azure-storage",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
@@ -14,7 +14,7 @@
   "dependencies": {
     "@azure/identity": "^3.3.1",
     "@azure/storage-blob": "^12.16.0",
-    "@rnbh/hub-interface": "workspace:^",
+    "@rn-buildhub/storage-interface": "workspace:^",
     "@types/node": "^18.18.4",
     "dotenv": "^16.3.1",
     "typescript": "^4.9.5"

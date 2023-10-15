@@ -1,7 +1,7 @@
 import { BlobServiceClient, BlockBlobClient, ContainerClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { DefaultAzureCredential } from "@azure/identity";
 
-import { Build, HubAdapter, ProjectBuildInfo } from "@rnbh/hub-interface";
+import { Build, HubAdapter, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
 import path from "path";
 import process from "process";
 
@@ -113,7 +113,7 @@ class AzureHubAdapter extends HubAdapter {
       version: 1,
       id: buildId
     };
-    await this.blob(`${buildpath}/info.json`).uploadData(Buffer.from(JSON.stringify(info), "utf-8"));
+    await this.blob(`${buildpath}/info.json`).uploadData(Buffer.from(JSON.stringify(infoToSave), "utf-8"));
   }
 
   async getBuildInfo(buildId: string): Promise<ProjectBuildInfo> {

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync, ExecSyncOptions, ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { ProjectConfiguration } from './cloud/projectsManagement';
+import { Build, HubAdapter } from '@rn-buildhub/storage-interface';
 
 const util = require('util');
 const execAsync = util.promisify(require('child_process').exec);
@@ -64,7 +65,7 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function getAdapter(config: ProjectConfiguration) {
+export function getAdapter(config: ProjectConfiguration): HubAdapter {
   if (!config.remoteAdapter.name) {
     throw new Error('Remote adapter name is required');
   }

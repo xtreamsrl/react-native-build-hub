@@ -21,7 +21,7 @@ import { capitalize, getAdapter, getBuildFolderByBuildId, getRootDestinationFold
 import logger from '../logger';
 import { iosBuildPlatforms } from '../iosUtils';
 import { ProjectConfiguration } from './projectsManagement';
-import { Build, HubAdapter } from '@rnbh/hub-interface';
+import { Build, HubAdapter } from '@rn-buildhub/storage-interface';
 
 async function zipFolder(folderPath: string, outputZipPath: string) {
   if (!fs.existsSync(folderPath)) {

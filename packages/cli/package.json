@@ -1,5 +1,5 @@
 {
-  "name": "@xtreamsrl/react-native-incremental-cli",
+  "name": "@rn-buildhub/cli",
   "version": "0.2.0",
   "description": "React Native CLI that caches native builds and speedup your development and release cycle",
   "author": "Luca Micieli",
@@ -31,7 +31,7 @@
     "@react-native-community/cli-platform-android": "10.2.0",
     "@react-native-community/cli-platform-ios": "10.2.0",
     "@react-native-community/cli-tools": "10.1.1",
-    "@rnbh/hub-interface": "workspace:^",
+    "@rn-buildhub/storage-interface": "workspace:^",
     "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.2.0",
@@ -53,6 +53,7 @@
     "@oclif/test": "^2.3.7",
     "@react-native-community/cli": "^10.2.0",
     "@react-native-community/cli-config": "^10.1.1",
+    "@rn-buildhub/azure-storage": "workspace:^",
     "@types/chai": "^4",
     "@types/mocha": "^9.0.0",
     "@types/node": "^18.18.4",
@@ -75,10 +76,10 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "@rnbh/azure-blob-storage-hub": "workspace:^"
+    "@rn-buildhub/azure-storage": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@rnbh/azure-blob-storage-hub": {
+    "@rn-buildhub/azure-storage": {
       "optional": true
     }
   },
@@ -99,7 +100,7 @@
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
     "typecheck": "tsc --noEmit",
-    "prepack": "pnpm run build && oclif manifest && oclif readme",
+    "prepack": "pnpm run build && oclif manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif readme && git add README.md",
     "run": "./bin/dev run -a",

@@ -4,12 +4,12 @@ import { downloadBuild, getLastBuild, makeCurrentBuild } from '../application/cl
 import { Flags } from '@oclif/core';
 import logger from '../application/logger';
 import { getBuildFolderByBuildId } from '../application/utils';
-import { ProjectConfiguration, updateCurrentBuildInFile } from "../application/cloud/projectsManagement";
+import { ProjectConfiguration, updateCurrentBuildInFile } from '../application/cloud/projectsManagement';
 
 export async function updateCurrentBuild(buildId: string, config: ProjectConfiguration) {
   let buildIdToDownload: string;
 
-  if (buildId === "last") {
+  if (buildId === 'last') {
     const buildId = await getLastBuild(config);
     buildIdToDownload = buildId;
   } else {

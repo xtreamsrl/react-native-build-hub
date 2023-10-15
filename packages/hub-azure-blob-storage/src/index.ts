@@ -1,17 +1,22 @@
 import { BlobServiceClient, BlockBlobClient, ContainerClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { DefaultAzureCredential } from "@azure/identity";
 
-import { Build, HubAdapter } from "./adapter";
+import { Build, HubAdapter, ProjectBuildInfo } from "@rnbh/hub-interface";
 import path from "path";
-import { getProjectRootDir } from "../application/utils";
+import process from "process";
 
-const ENV_CONNECTION_STRING = "NXCACHE_AZURE_CONNECTION_STRING";
-const ENV_ACCOUNT_KEY = "NXCACHE_AZURE_ACCOUNT_KEY";
-const ENV_ACCOUNT_NAME = "NXCACHE_AZURE_ACCOUNT_NAME";
-const ENV_CONTAINER = "NXCACHE_AZURE_CONTAINER";
-const ENV_AZURE_URL = "NXCACHE_AZURE_URL";
-const ENV_SAS_URL = "NXCACHE_AZURE_SAS_URL";
-const ENV_AZURE_AD_AUTH = "NXCACHE_AZURE_AD_AUTH";
+export function getProjectRootDir() {
+  // todo improve this
+  return process.cwd();
+}
+
+const ENV_CONNECTION_STRING = "RNBH_AZURE_CONNECTION_STRING";
+const ENV_ACCOUNT_KEY = "RNBH_AZURE_ACCOUNT_KEY";
+const ENV_ACCOUNT_NAME = "RNBH_AZURE_ACCOUNT_NAME";
+const ENV_CONTAINER = "RNBH_AZURE_CONTAINER";
+const ENV_AZURE_URL = "RNBH_AZURE_URL";
+const ENV_SAS_URL = "RNBH_AZURE_SAS_URL";
+const ENV_AZURE_AD_AUTH = "RNBH_AZURE_AD_AUTH";
 
 const getEnv = (key: string) => process.env[key];
 
@@ -63,20 +68,7 @@ interface AzureBlobRunnerOptions {
   adAuth?: boolean;
 }
 
-/*
-export default createCustomRunner<AzureBlobRunnerOptions>(async (options) => {
-  initEnv(options);
-
-  return {
-    name: "Azure Blob Storage",
-    fileExists: (filename) => blob(filename).exists(),
-    retrieveFile: async (filename) =>
-      (await blob(filename).download()).readableStreamBody!,
-    storeFile: (filename, stream) => blob(filename).uploadStream(stream),
-  };
-}); */
-
-export class AzureHubAdapter extends HubAdapter {
+class AzureHubAdapter extends HubAdapter {
   private blob: (filename: string) => BlockBlobClient;
 
   // todo validate config
@@ -88,7 +80,11 @@ export class AzureHubAdapter extends HubAdapter {
 
   async upload(buildId: string, buffer: Buffer, fileName: string): Promise<string> {
     const buildpath = this.getBuildPath(buildId);
-    await this.blob(`${buildpath}/${fileName}`).uploadData(buffer);
+    await this.blob(`${buildpath}/${fileName}`).uploadData(buffer, {
+      metadata:{
+        createdAt: new Date().toISOString(),
+      }
+    });
     return `${buildpath}/${fileName}`;
   }
 
@@ -111,13 +107,16 @@ export class AzureHubAdapter extends HubAdapter {
     iosBuilds: Build[];
   }): Promise<void> {
     const buildpath = this.getBuildPath(buildId);
-    await this.blob(`${buildpath}/info.json`).uploadData(Buffer.from(JSON.stringify(info), "utf-8"))
+    const infoToSave: ProjectBuildInfo = {
+      ...info,
+      createdAt: new Date().toISOString(),
+      version: 1,
+      id: buildId
+    };
+    await this.blob(`${buildpath}/info.json`).uploadData(Buffer.from(JSON.stringify(info), "utf-8"));
   }
 
-  async getBuildInfo(buildId: string): Promise<{
-    androidBuilds: Build[];
-    iosBuilds: Build[];
-  }>{
+  async getBuildInfo(buildId: string): Promise<ProjectBuildInfo> {
     const buildpath = this.getBuildPath(buildId);
     const fileContent = await this.blob(`${buildpath}/info.json`).downloadToBuffer();
     return JSON.parse(fileContent.toString());
@@ -127,3 +126,5 @@ export class AzureHubAdapter extends HubAdapter {
     return this.blob(path).downloadToBuffer();
   }
 }
+
+export default AzureHubAdapter;

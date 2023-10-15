@@ -1,6 +1,6 @@
 {
   "name": "@xtreamsrl/react-native-incremental-cli",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "React Native CLI that caches native builds and speedup your development and release cycle",
   "author": "Luca Micieli",
   "bin": {
@@ -31,6 +31,7 @@
     "@react-native-community/cli-platform-android": "10.2.0",
     "@react-native-community/cli-platform-ios": "10.2.0",
     "@react-native-community/cli-tools": "10.1.1",
+    "@rnbh/hub-interface": "workspace:^",
     "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.2.0",
@@ -54,7 +55,7 @@
     "@react-native-community/cli-config": "^10.1.1",
     "@types/chai": "^4",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.18.12",
+    "@types/node": "^18.18.4",
     "@types/prompts": "^2.4.2",
     "chai": "^4",
     "eslint": "^7.32.0",
@@ -70,8 +71,16 @@
     "prettier": "^2.8.4",
     "shx": "^0.3.3",
     "ts-node": "^10.9.1",
-    "tslib": "^2.5.0",
+    "tslib": "^2.6.2",
     "typescript": "^4.9.5"
+  },
+  "peerDependencies": {
+    "@rnbh/azure-blob-storage-hub": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@rnbh/azure-blob-storage-hub": {
+      "optional": true
+    }
   },
   "oclif": {
     "bin": "react-native-engine",
@@ -94,7 +103,6 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif readme && git add README.md",
     "run": "./bin/dev run -a",
-    "prepare": "husky install",
     "autoformat:staged": "pnpm dlx lint-staged",
     "rollup": "shx rm -rf dist && rollup -c rollup.config.mjs",
     "a": "DEBUG=* ./bin/run help"

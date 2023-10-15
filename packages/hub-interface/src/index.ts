@@ -1,4 +1,3 @@
-// create a random build id (alfanumeric string)
 function createBuildId(): string {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
@@ -12,14 +11,12 @@ export type Build = {
   path: string;
 };
 
-export type ProjectBuildDoc = {
+export type ProjectBuildInfo = {
   id: string;
-  projectId: string;
   androidBuilds: Build[];
   iosBuilds: Build[];
   createdAt: string;
-  createdBy: string;
-  version: string;
+  version: 1;
 };
 
 export abstract class HubAdapter {
@@ -37,10 +34,7 @@ export abstract class HubAdapter {
   }): Promise<void>;
 
 
-  abstract getBuildInfo(buildId: string): Promise<{
-    androidBuilds: Build[];
-    iosBuilds: Build[];
-  }>;
+  abstract getBuildInfo(buildId: string): Promise<ProjectBuildInfo>;
 
   abstract upload(buildId: string, buffer: Buffer, fileName: string): Promise<string>;
   abstract download(path: string): Promise<Buffer>;

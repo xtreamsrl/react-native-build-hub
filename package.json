@@ -5,6 +5,7 @@
     "lint-staged": "^13.1.2"
   },
   "scripts": {
+    "prepare": "husky install",
     "autoformat:staged": "pnpm dlx lint-staged"
   }
 }

@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
+import fs from 'node:fs';
+import path from 'node:path';
 
 import {
   addDoc,
@@ -13,16 +13,15 @@ import {
   query,
   serverTimestamp,
   setDoc,
-  where
-} from "firebase/firestore";
-import { getBytes, getStorage, ref, StorageReference, uploadBytesResumable } from "firebase/storage";
-import AdmZip from "adm-zip";
-import { capitalize, getAdapter, getBuildFolderByBuildId, getRootDestinationFolder } from "../utils";
-import logger from "../logger";
-import { iosBuildPlatforms } from "../iosUtils";
-import { ProjectConfiguration } from "./projectsManagement";
-import { Build, HubAdapter } from "../../adapters/adapter";
-
+  where,
+} from 'firebase/firestore';
+import { getBytes, getStorage, ref, StorageReference, uploadBytesResumable } from 'firebase/storage';
+import AdmZip from 'adm-zip';
+import { capitalize, getAdapter, getBuildFolderByBuildId, getRootDestinationFolder } from '../utils';
+import logger from '../logger';
+import { iosBuildPlatforms } from '../iosUtils';
+import { ProjectConfiguration } from './projectsManagement';
+import { Build, HubAdapter } from '@rnbh/hub-interface';
 
 async function zipFolder(folderPath: string, outputZipPath: string) {
   if (!fs.existsSync(folderPath)) {
@@ -42,10 +41,10 @@ function clearLastLine() {
 async function upload(fileRef: StorageReference, buffer: Buffer, filename: string) {
   return new Promise((resolve, reject) => {
     const uploadTask = uploadBytesResumable(fileRef, buffer);
-    process.stdout.write("\n");
+    process.stdout.write('\n');
 
     uploadTask.on(
-      "state_changed",
+      'state_changed',
       snapshot => {
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -53,12 +52,12 @@ async function upload(fileRef: StorageReference, buffer: Buffer, filename: strin
         clearLastLine();
         logger.info(`Upload of ${filename} is ${progress.toFixed(0)}% done`);
         switch (snapshot.state) {
-        case "paused":
-          logger.debug("Upload is paused");
-          break;
-        case "running":
-          logger.debug("Upload is running");
-          break;
+          case 'paused':
+            logger.debug('Upload is paused');
+            break;
+          case 'running':
+            logger.debug('Upload is running');
+            break;
         }
       },
       error => {
@@ -67,7 +66,7 @@ async function upload(fileRef: StorageReference, buffer: Buffer, filename: strin
       },
       () => {
         resolve(uploadTask.snapshot.ref);
-      }
+      },
     );
   });
 }
@@ -85,7 +84,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], c
     }); */
   const adapter = getAdapter(config);
   const buildId = adapter.createBuildId();
-  const tempBuildsFolder = path.join(getRootDestinationFolder(), "temp_builds", buildId);
+  const tempBuildsFolder = path.join(getRootDestinationFolder(), 'temp_builds', buildId);
   fs.mkdirSync(tempBuildsFolder, { recursive: true });
 
   logger.info(`Found ${androidBuilds.length} android builds and ${iosBuilds.length} ios builds`);
@@ -114,7 +113,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], c
   await adapter.setLastBuild(buildId);
   await adapter.saveBuildInfo(buildId, {
     androidBuilds: androidBuilds,
-    iosBuilds: iosBuilds
+    iosBuilds: iosBuilds,
   });
   logger.info(`Builds created successfully. Build id: ${buildId}`);
 
@@ -151,7 +150,7 @@ function unzipFile(zipFilePath: string, destinationFolder: string): void {
 
 async function downloadZipBuild(buildInfo: Build, buildId: string, adapter: HubAdapter) {
   // const fileRef = ref(getStorage(), buildInfo.path);
-  const tempZipPath = path.join(getRootDestinationFolder(), "temp_builds", buildId, path.basename(buildInfo.path));
+  const tempZipPath = path.join(getRootDestinationFolder(), 'temp_builds', buildId, path.basename(buildInfo.path));
   logger.debug(`Downloading ${buildInfo.path} to ${tempZipPath}`);
   //const fileBuffer = await getBytes(fileRef);
   const buffer = await adapter.download(buildInfo.path);
@@ -170,7 +169,7 @@ export async function downloadBuild(buildId: string, projectConfig: ProjectConfi
   // todo improve parallelism
   for (const buildInfo of build.androidBuilds) {
     const tempZipPath = await downloadZipBuild(buildInfo, buildId, adapter);
-    const destinationFolder = path.join(getBuildFolderByBuildId(buildId), "android", buildInfo.flavor, buildInfo.type);
+    const destinationFolder = path.join(getBuildFolderByBuildId(buildId), 'android', buildInfo.flavor, buildInfo.type);
     await unzipFile(tempZipPath, destinationFolder);
     fs.rmSync(tempZipPath);
   }
@@ -178,11 +177,11 @@ export async function downloadBuild(buildId: string, projectConfig: ProjectConfi
     const tempZipPath = await downloadZipBuild(buildInfo, buildId, adapter);
     const destinationFolder = path.join(
       getRootDestinationFolder(),
-      "builds",
+      'builds',
       buildId,
-      "ios",
+      'ios',
       `${buildInfo.device}-${buildInfo.flavor}`,
-      capitalize(buildInfo.type)
+      capitalize(buildInfo.type),
     );
 
     await unzipFile(tempZipPath, destinationFolder);
@@ -191,11 +190,11 @@ export async function downloadBuild(buildId: string, projectConfig: ProjectConfi
 }
 
 export async function makeCurrentBuild(buildId: string) {
-  const androidPath = path.join(getRootDestinationFolder(), "android");
+  const androidPath = path.join(getRootDestinationFolder(), 'android');
   if (fs.existsSync(androidPath)) {
     fs.rmSync(androidPath, { recursive: true });
   }
-  const iosPath = path.join(getRootDestinationFolder(), "ios");
+  const iosPath = path.join(getRootDestinationFolder(), 'ios');
   if (fs.existsSync(iosPath)) {
     fs.rmSync(iosPath, { recursive: true });
   }
@@ -204,38 +203,38 @@ export async function makeCurrentBuild(buildId: string) {
 
 export function getAvailableCurrentBuilds() {
   const androidBuilds: Build[] = [];
-  const androidFolder = path.join(getRootDestinationFolder(), "android");
+  const androidFolder = path.join(getRootDestinationFolder(), 'android');
   if (fs.existsSync(androidFolder)) {
     const flavorsFolders = fs.readdirSync(androidFolder);
     for (const flavorFolder of flavorsFolders) {
-      const debugBuildPath = path.join(androidFolder, flavorFolder, "debug");
+      const debugBuildPath = path.join(androidFolder, flavorFolder, 'debug');
       if (fs.existsSync(debugBuildPath)) {
         androidBuilds.push({
-          device: "all",
+          device: 'all',
           flavor: flavorFolder,
           release: false,
           debug: true,
-          type: "debug",
-          path: debugBuildPath
+          type: 'debug',
+          path: debugBuildPath,
         });
       }
     }
   }
   const iosBuilds: Build[] = [];
-  const iosFolder = path.join(getRootDestinationFolder(), "ios");
+  const iosFolder = path.join(getRootDestinationFolder(), 'ios');
   if (fs.existsSync(iosFolder)) {
     const flavorsFolders = fs.readdirSync(iosFolder);
     for (const flavorFolder of flavorsFolders) {
-      const [deviceType, ...flavor] = flavorFolder.split("-");
-      const debugBuildPath = path.join(iosFolder, flavorFolder, "Debug");
+      const [deviceType, ...flavor] = flavorFolder.split('-');
+      const debugBuildPath = path.join(iosFolder, flavorFolder, 'Debug');
       if (fs.existsSync(debugBuildPath) && deviceType === iosBuildPlatforms.simulator.name) {
         iosBuilds.push({
-          device: "iphonesimulator",
-          flavor: flavor.join("-"),
+          device: 'iphonesimulator',
+          flavor: flavor.join('-'),
           release: false,
           debug: true,
-          type: "debug",
-          path: debugBuildPath
+          type: 'debug',
+          path: debugBuildPath,
         });
       }
     }

@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import { execSync, ExecSyncOptions, ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { ProjectConfiguration } from './cloud/projectsManagement';
-import { AzureHubAdapter } from '../adapters/azure';
 
 const util = require('util');
 const execAsync = util.promisify(require('child_process').exec);
@@ -66,6 +65,13 @@ export function capitalize(str: string) {
 }
 
 export function getAdapter(config: ProjectConfiguration) {
-  // todo select from configuration and import dynamically
-  return new AzureHubAdapter(config.remoteAdapter.config);
+  if (!config.remoteAdapter.name) {
+    throw new Error('Remote adapter name is required');
+  }
+  try {
+    const adapter = require(config.remoteAdapter.name);
+    return new adapter.default(config.remoteAdapter.config);
+  } catch (e) {
+    throw new Error(`Remote adapter ${config.remoteAdapter.name} not found`);
+  }
 }

@@ -4,8 +4,8 @@ import { runApp as runIos } from '../application/runIos';
 import { startMetro, checkIsMetroRunning } from '../application/metroManager';
 import logger from '../application/logger';
 import { iosBuildPlatforms } from '../application/iosUtils';
-import { updateCurrentBuild } from "./makeBuildCurrent";
-import RemoteAwareCommand from "../_projectAwareCommand";
+import { updateCurrentBuild } from './makeBuildCurrent';
+import RemoteAwareCommand from '../_projectAwareCommand';
 
 export default class Run extends RemoteAwareCommand {
   static description = 'Run the native app';
@@ -38,7 +38,7 @@ export default class Run extends RemoteAwareCommand {
     const start = performance.now();
     logger.info('Checking if metro is running...');
 
-    if(buildId !== 'local') {
+    if (buildId !== 'local') {
       logger.info(`Requested to run specific id ${buildId}`);
       // todo remote command only if needed?
       // do we have to copy to local? can't we just run from build folder?

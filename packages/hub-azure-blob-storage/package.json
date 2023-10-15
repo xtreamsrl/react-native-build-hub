@@ -1,0 +1,22 @@
+{
+  "name": "@rnbh/azure-blob-storage-hub",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/identity": "^3.3.1",
+    "@azure/storage-blob": "^12.16.0",
+    "@rnbh/hub-interface": "workspace:^",
+    "@types/node": "^18.18.4",
+    "dotenv": "^16.3.1",
+    "typescript": "^4.9.5"
+  }
+}

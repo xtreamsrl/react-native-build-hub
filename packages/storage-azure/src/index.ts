@@ -33,7 +33,7 @@ function getBlockBlobClient(filename: string, options: AzureBlobRunnerOptions) {
   }
 
   if (!container) {
-    throw Error("Did not pass valid container. Supply the container either via env or nx.json.");
+    throw Error("Did not pass valid container. Supply the container either via env or config.");
   }
 
   if (connectionString) {
@@ -55,7 +55,7 @@ function getBlockBlobClient(filename: string, options: AzureBlobRunnerOptions) {
     }
   }
 
-  throw Error(`Did not pass valid credentials. Supply them either via env or nx.json.`);
+  throw Error(`Did not pass valid credentials. Supply them either via env or config.json.`);
 }
 
 interface AzureBlobRunnerOptions {

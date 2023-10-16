@@ -54,6 +54,7 @@
     "@react-native-community/cli": "^10.2.0",
     "@react-native-community/cli-config": "^10.1.1",
     "@rn-buildhub/azure-storage": "workspace:^",
+    "@rn-buildhub/s3-storage": "workspace:^0.0.1",
     "@types/chai": "^4",
     "@types/mocha": "^9.0.0",
     "@types/node": "^18.18.4",
@@ -76,10 +77,14 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "@rn-buildhub/azure-storage": "workspace:^"
+    "@rn-buildhub/azure-storage": "workspace:^",
+    "@rn-buildhub/s3-storage": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@rn-buildhub/azure-storage": {
+      "optional": true
+    },
+    "@rn-buildhub/s3-storage": {
       "optional": true
     }
   },

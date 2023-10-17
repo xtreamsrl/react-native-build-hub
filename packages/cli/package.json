@@ -8,10 +8,10 @@
     "@rn-buildhub/cli": "./bin/run",
     "@rn-buildhub": "./bin/run"
   },
-  "homepage": "https://github.com/xtreamsrl/react-native-incremental-cli",
+  "homepage": "https://github.com/xtreamsrl/react-native-build-hub",
   "license": "MIT",
   "main": "dist/index.js",
-  "repository": "xtreamsrl/react-native-incremental-cli",
+  "repository": "https://github.com/xtreamsrl/react-native-build-hub",
   "files": [
     "/bin",
     "/dist",

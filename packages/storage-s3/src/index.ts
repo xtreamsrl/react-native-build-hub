@@ -22,7 +22,7 @@ export function getProjectRootDir() {
   return process.cwd();
 }
 
-function getOptions(options: AwsNxCacheOptions) {
+function getOptions(options: AwsRemoteOptions) {
   return {
     awsAccessKeyId: process.env.RNBH_AWS_ACCESS_KEY_ID ?? options.awsAccessKeyId,
     awsSecretAccessKey: process.env.RNBH_AWS_SECRET_ACCESS_KEY ?? options.awsSecretAccessKey,

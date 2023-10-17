@@ -1,16 +1,17 @@
-import { executeCommandWithOutPut, getAppName, getRootDestinationFolder } from './utils';
+import { executeCommandWithOutPut, getAppName, getBuildFolderByBuildId, getRootDestinationFolder } from "./utils";
+import path from "path";
 
 export const iosBuildPlatforms = {
   simulator: {
-    name: 'iphonesimulator',
-    ext: 'app',
-    buildCmd: 'build',
+    name: "iphonesimulator",
+    ext: "app",
+    buildCmd: "build"
   },
   iphone: {
-    name: 'iphoneos',
-    ext: 'ipa',
-    buildCmd: 'archive',
-  },
+    name: "iphoneos",
+    ext: "ipa",
+    buildCmd: "archive"
+  }
 };
 
 export type IosPlatform = {
@@ -19,10 +20,21 @@ export type IosPlatform = {
   buildCmd: string;
 };
 
-export function getIosBuildDestination(platform: { ext: string; buildCmd: string; name: string }, buildType: string) {
+export function getIosBuildDestination(platform: {
+  ext: string;
+  buildCmd: string;
+  name: string
+}, buildType: string, buildId?: string) {
+  const baseBuildFolder = buildId ? getBuildFolderByBuildId(buildId) : getRootDestinationFolder();
+
   // todo handle Debug/release
-  const destinationDir = `${getRootDestinationFolder()}/ios/${platform.name}-${buildType}/Debug`;
-  const destination = `${destinationDir}/${getAppName()}.${platform.ext}`;
+  const destinationDir = path.join(
+    baseBuildFolder,
+    'ios',
+    `${platform.name}-${buildType}`,
+    'Debug'
+  );
+  const destination = path.join(destinationDir, `${getAppName()}.${platform.ext}`);
   return { destinationDir, destination };
 }
 
@@ -32,14 +44,14 @@ function getTargetPaths(buildSettings: string) {
   // Find app in all building settings - look for WRAPPER_EXTENSION: 'app',
   for (const i in settings) {
     const wrapperExtension = settings[i].buildSettings.WRAPPER_EXTENSION;
-    if (wrapperExtension === 'app') {
+    if (wrapperExtension === "app") {
       return {
         targetBuildDir: settings[i].buildSettings.TARGET_BUILD_DIR,
-        executableFolderPath: settings[i].buildSettings.EXECUTABLE_FOLDER_PATH,
+        executableFolderPath: settings[i].buildSettings.EXECUTABLE_FOLDER_PATH
       };
     }
   }
-  throw new Error('app destination not found');
+  throw new Error("app destination not found");
 }
 
 export function getBuildFolder(projectName: string, release: boolean, buildFlavor: string, sdk: string) {
@@ -49,12 +61,12 @@ export function getBuildFolder(projectName: string, release: boolean, buildFlavo
     -workspace ./ios/${projectName}.xcworkspace \
     -scheme ${buildFlavor} \
     -sdk ${sdk}\
-    -configuration ${release ? 'Release' : 'Debug'} \
+    -configuration ${release ? "Release" : "Debug"} \
     -showBuildSettings\
      -json`,
     {
-      encoding: 'utf8',
-    },
+      encoding: "utf8"
+    }
   );
   const { executableFolderPath } = getTargetPaths(buildSettings as string);
 

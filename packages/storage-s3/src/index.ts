@@ -2,7 +2,7 @@ import { Readable } from "node:stream";
 import * as clientS3 from "@aws-sdk/client-s3";
 import { fromNodeProviderChain } from "@aws-sdk/credential-providers";
 
-export interface AwsNxCacheOptions {
+export interface AwsRemoteOptions {
   awsAccessKeyId?: string;
   awsSecretAccessKey?: string;
   awsProfile?: string;
@@ -52,7 +52,7 @@ class S3Storage extends HubAdapter {
 
   // todo validate config
 
-  public constructor(fileOptions?: AwsNxCacheOptions) {
+  public constructor(fileOptions?: AwsRemoteOptions) {
     super();
     require("dotenv").config({ path: path.join(getProjectRootDir(), ".env") });
     const options = getOptions(fileOptions || {});

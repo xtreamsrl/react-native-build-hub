@@ -101,10 +101,8 @@
     "typecheck": "tsc --noEmit",
     "prepack": "pnpm run build && oclif manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif readme && git add README.md",
     "run": "./bin/dev run -a",
-    "autoformat:staged": "pnpm dlx lint-staged",
-    "a": "DEBUG=* ./bin/run help"
+    "autoformat:staged": "pnpm dlx lint-staged"
   },
   "engines": {
     "node": ">=12.0.0"

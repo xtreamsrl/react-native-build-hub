@@ -11,6 +11,6 @@
     "build": "lerna run build",
     "version": "lerna version",
     "version-publish": "lerna publish",
-    "publish:from-package": "lerna publish --from-package"
+    "publish:from-package": "lerna publish from-package"
   }
 }

@@ -3,9 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import { execSync, ExecSyncOptions, ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { ProjectConfiguration } from './cloud/projectsManagement';
-import { Build, HubAdapter } from '@rn-buildhub/storage-interface';
+import { RemoteStorage } from '@rn-buildhub/storage-interface';
+import util from 'util';
 
-const util = require('util');
 const execAsync = util.promisify(require('child_process').exec);
 
 export function executeCommand(command: string, options?: ExecSyncOptionsWithBufferEncoding) {
@@ -65,14 +65,14 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function getAdapter(config: ProjectConfiguration): HubAdapter {
-  if (!config.remoteAdapter.name) {
+export function getRemoteStorage(config: ProjectConfiguration): RemoteStorage {
+  if (!config.remote.name) {
     throw new Error('Remote adapter name is required');
   }
   try {
-    const adapter = require(config.remoteAdapter.name);
-    return new adapter.default(config.remoteAdapter.config);
+    const connectorPackage = require(config.remote.name);
+    return new connectorPackage.default(config.remote.config);
   } catch (e) {
-    throw new Error(`Remote adapter ${config.remoteAdapter.name} not found`);
+    throw new Error(`Remote adapter ${config.remote.name} not found`);
   }
 }

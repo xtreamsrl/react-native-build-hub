@@ -1,16 +1,13 @@
 import { Command } from '@oclif/core';
-import { checkAuth } from './application/cloud/auth';
 import {
   checkProject,
   ProjectConfiguration,
-  ProjectData,
-  ProjectFileSchema,
-  RemoteAdapterConfig,
+  RemoteConfig,
 } from './application/cloud/projectsManagement';
 
 export default abstract class RemoteAwareCommand extends Command {
   currentProject: ProjectConfiguration = {
-    get remoteAdapter(): RemoteAdapterConfig {
+    get remote(): RemoteConfig {
       throw new Error('select a project');
     },
     get currentBuildId(): string | null {

@@ -1,7 +1,7 @@
 import { BlobServiceClient, BlockBlobClient, ContainerClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { DefaultAzureCredential } from "@azure/identity";
 
-import { Build, HubAdapter, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
+import { Build, RemoteStorage, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
 import path from "path";
 import process from "process";
 
@@ -68,7 +68,7 @@ interface AzureBlobRunnerOptions {
   adAuth?: boolean;
 }
 
-class AzureHubAdapter extends HubAdapter {
+class AzureStorage extends RemoteStorage {
   private blob: (filename: string) => BlockBlobClient;
 
   // todo validate config
@@ -127,4 +127,4 @@ class AzureHubAdapter extends HubAdapter {
   }
 }
 
-export default AzureHubAdapter;
+export default AzureStorage;

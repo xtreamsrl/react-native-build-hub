@@ -3,7 +3,7 @@ import {Storage, Bucket} from "@google-cloud/storage";
 import process from "node:process";
 import path from "node:path";
 import fs from "node:fs";
-import { Build, HubAdapter, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
+import { Build, RemoteStorage, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
 
 export interface GCPStorageOptions {
   gcpBucket?: string;
@@ -24,7 +24,7 @@ function getOptions(options: GCPStorageOptions) {
 
 
 // todo rename hub adapter to stare and then create a hub that extends the storage?
-class GCPStorage extends HubAdapter {
+class GCPStorage extends RemoteStorage {
   private bucket: Bucket;
 
   // todo validate config

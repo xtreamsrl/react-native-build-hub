@@ -1,13 +1,14 @@
 {
   "name": "@rn-buildhub/gcp-storage",
   "version": "0.3.0",
-  "description": "",
+  "description": "Google Cloud Storage implementation of @rn-buildhub/storage-interface",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepack": "pnpm run build"
   },
   "author": "",
   "license": "ISC",

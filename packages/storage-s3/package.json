@@ -1,13 +1,14 @@
 {
   "name": "@rn-buildhub/s3-storage",
   "version": "0.3.0",
-  "description": "",
+  "description": "S3 storage for @rn-buildhub/storage-interface",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepack": "pnpm run build"
   },
   "author": "",
   "license": "ISC",

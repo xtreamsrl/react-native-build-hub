@@ -10,7 +10,7 @@ import { Build, RemoteStorage } from '@rn-buildhub/storage-interface';
 
 async function zipFolder(folderPath: string, outputZipPath: string) {
   if (!fs.existsSync(folderPath)) {
-    console.error(`The folder "${folderPath}" does not exist.`);
+    logger.error(`The folder "${folderPath}" does not exist.`);
     return;
   }
   const newZip = new AdmZip();
@@ -65,7 +65,6 @@ function unzipFile(zipFilePath: string, destinationFolder: string): void {
 
   zip.extractAllTo(destinationFolder, true);
 
-  console.log(`File extracted to ${destinationFolder}`);
 }
 
 async function downloadZipBuild(buildInfo: Build, buildId: string, adapter: RemoteStorage) {

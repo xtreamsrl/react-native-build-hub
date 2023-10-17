@@ -43,7 +43,6 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
     executeCommand(`mkdir -p ${destinationDir}`);
     executeCommand(`rm -rf ${destination}`);
     const copyCommand = `cp -a '${source}' '${destination}'`;
-    console.log(`Copying: ${copyCommand}`);
     executeCommand(copyCommand);
     return destination;
   } else {

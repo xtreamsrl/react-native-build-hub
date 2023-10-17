@@ -35,7 +35,6 @@ function checkBuildPresent(buildType: string, target: any) {
 function installApp(deviceUdid: string, buildType: string, target: any) {
   const { destination } = getIosBuildDestination(target, buildType);
   const res = childProcess.execSync(`xcrun simctl install ${deviceUdid} ${destination}`, { encoding: 'utf-8' });
-  console.log('res', res);
 }
 
 function launchApp(deviceUid: string, bundleId: string) {

@@ -14,7 +14,7 @@ repack it with the new JS bundle.
 For now, the developers should choose if the native build should be forced or not. In the future, the cli tool may
 add some heuristics to decide when to force the native build.
 
-![Run android with build cached](./docs/assets/run-android-build-cached.png)
+![Run android with build cached](./packages/cli/docs/assets/run-android-build-cached.png)
 
 ## Disclaimer
 

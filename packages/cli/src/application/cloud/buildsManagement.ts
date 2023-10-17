@@ -1,27 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  getFirestore,
-  limit,
-  orderBy,
-  query,
-  serverTimestamp,
-  setDoc,
-  where,
-} from 'firebase/firestore';
-import { getBytes, getStorage, ref, StorageReference, uploadBytesResumable } from 'firebase/storage';
 import AdmZip from 'adm-zip';
-import { capitalize, getAdapter, getBuildFolderByBuildId, getRootDestinationFolder } from '../utils';
+import { capitalize, getRemoteStorage, getBuildFolderByBuildId, getRootDestinationFolder } from '../utils';
 import logger from '../logger';
 import { iosBuildPlatforms } from '../iosUtils';
 import { ProjectConfiguration } from './projectsManagement';
-import { Build, HubAdapter } from '@rn-buildhub/storage-interface';
+import { Build, RemoteStorage } from '@rn-buildhub/storage-interface';
 
 async function zipFolder(folderPath: string, outputZipPath: string) {
   if (!fs.existsSync(folderPath)) {
@@ -33,56 +18,9 @@ async function zipFolder(folderPath: string, outputZipPath: string) {
   return newZip.writeZipPromise(outputZipPath);
 }
 
-function clearLastLine() {
-  process.stdout.moveCursor(0, -1); // up one line
-  process.stdout.clearLine(1); // from cursor to end
-}
-
-async function upload(fileRef: StorageReference, buffer: Buffer, filename: string) {
-  return new Promise((resolve, reject) => {
-    const uploadTask = uploadBytesResumable(fileRef, buffer);
-    process.stdout.write('\n');
-
-    uploadTask.on(
-      'state_changed',
-      snapshot => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        clearLastLine();
-        logger.info(`Upload of ${filename} is ${progress.toFixed(0)}% done`);
-        switch (snapshot.state) {
-          case 'paused':
-            logger.debug('Upload is paused');
-            break;
-          case 'running':
-            logger.debug('Upload is running');
-            break;
-        }
-      },
-      error => {
-        // Handle unsuccessful uploads
-        reject(error);
-      },
-      () => {
-        resolve(uploadTask.snapshot.ref);
-      },
-    );
-  });
-}
-
 export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], config: ProjectConfiguration) {
-  // for each build zip the folder and upload to firebase storage than create e build document in the builds collection
-  /*
-    create a build folder in firestore
-    const buildRef = await addDoc(collection(getFirestore(), "builds"), {
-      projectId: projectId,
-      createdAt: serverTimestamp(),
-      createdBy: getAuth().currentUser!.uid,
-      version: "1.0.0" // todo,
-      const buildId = buildRef.id;
-    }); */
-  const adapter = getAdapter(config);
+  // for each build zip the folder and upload to remote storage than create a build document
+  const adapter = getRemoteStorage(config);
   const buildId = adapter.createBuildId();
   const tempBuildsFolder = path.join(getRootDestinationFolder(), 'temp_builds', buildId);
   fs.mkdirSync(tempBuildsFolder, { recursive: true });
@@ -91,25 +29,16 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], c
   // todo improve parallelism
   for (const buildInfo of [...androidBuilds, ...iosBuilds]) {
     const fileName = `${buildInfo.device}-${buildInfo.flavor}-${buildInfo.type}.zip`;
-    /*     const rootBuildsFolder = `projects/${projectId}/builds/${buildId}`;
-    const fileRef = ref(getStorage(), `${rootBuildsFolder}/${fileName}`); */
     const tempZipPath = path.join(tempBuildsFolder, fileName);
     logger.debug(`Zipping ${buildInfo.path} to ${tempZipPath}`);
     await zipFolder(buildInfo.path, tempZipPath);
     logger.debug(`Uploading ${tempZipPath}`);
     const fullPath = await adapter.upload(buildId, new AdmZip(tempZipPath).toBuffer(), fileName);
-    // await upload(fileRef, new AdmZip(tempZipPath).toBuffer(), fileName);
+
     logger.debug(`Uploaded ${tempZipPath}`);
     buildInfo.path = fullPath;
   }
-  // await setDoc(
-  //   buildRef,
-  //   {
-  //     androidBuilds: androidBuilds,
-  //     iosBuilds: iosBuilds,
-  //   },
-  //   { merge: true },
-  // );
+
   await adapter.setLastBuild(buildId);
   await adapter.saveBuildInfo(buildId, {
     androidBuilds: androidBuilds,
@@ -122,16 +51,7 @@ export async function uploadBuilds(androidBuilds: Build[], iosBuilds: Build[], c
 }
 
 export async function getLastBuild(config: ProjectConfiguration): Promise<string> {
-  // const lastBuild = await getDocs(
-  //   query(
-  //     collection(getFirestore(), 'builds'),
-  //     where('projectId', '==', projectId),
-  //     orderBy('createdAt', 'desc'),
-  //     limit(1),
-  //   ),
-  // );
-  // return { ...(lastBuild.docs[0].data() as ProjectBuildDoc), id: lastBuild.docs[0].id } as ProjectBuildDoc;
-  const adapter = getAdapter(config);
+  const adapter = getRemoteStorage(config);
   return adapter.getLastBuild();
 }
 
@@ -148,11 +68,9 @@ function unzipFile(zipFilePath: string, destinationFolder: string): void {
   console.log(`File extracted to ${destinationFolder}`);
 }
 
-async function downloadZipBuild(buildInfo: Build, buildId: string, adapter: HubAdapter) {
-  // const fileRef = ref(getStorage(), buildInfo.path);
+async function downloadZipBuild(buildInfo: Build, buildId: string, adapter: RemoteStorage) {
   const tempZipPath = path.join(getRootDestinationFolder(), 'temp_builds', buildId, path.basename(buildInfo.path));
   logger.debug(`Downloading ${buildInfo.path} to ${tempZipPath}`);
-  //const fileBuffer = await getBytes(fileRef);
   const buffer = await adapter.download(buildInfo.path);
   fs.mkdirSync(path.dirname(tempZipPath), { recursive: true });
   fs.writeFileSync(tempZipPath, buffer);
@@ -161,9 +79,7 @@ async function downloadZipBuild(buildInfo: Build, buildId: string, adapter: HubA
 }
 
 export async function downloadBuild(buildId: string, projectConfig: ProjectConfiguration): Promise<void> {
-  // const buildInfoDoc = await getDoc(doc(getFirestore(), "builds", buildId));
-  // const build = buildInfoDoc.data() as ProjectBuildDoc;
-  const adapter = getAdapter(projectConfig);
+  const adapter = getRemoteStorage(projectConfig);
   const build = await adapter.getBuildInfo(buildId);
   logger.info(`Found ${build.androidBuilds.length} android builds and ${build.iosBuilds.length} ios builds`);
   // todo improve parallelism

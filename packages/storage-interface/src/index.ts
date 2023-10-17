@@ -19,7 +19,7 @@ export type ProjectBuildInfo = {
   version: 1;
 };
 
-export abstract class HubAdapter {
+export abstract class RemoteStorage {
   createBuildId(): string {
     return createBuildId();
   }

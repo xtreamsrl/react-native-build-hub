@@ -12,7 +12,7 @@ export interface AwsRemoteOptions {
   awsForcePathStyle?: boolean;
 }
 
-import { Build, HubAdapter, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
+import { Build, RemoteStorage, ProjectBuildInfo } from "@rn-buildhub/storage-interface";
 
 import process from "process";
 import path from "path";
@@ -46,7 +46,7 @@ async function readableStreamToBuffer(readableStream: Readable): Promise<Buffer>
 }
 
 // todo rename hub adapter to stare and then create a hub that extends the storage?
-class S3Storage extends HubAdapter {
+class S3Storage extends RemoteStorage {
   private bucket: string;
   private s3: clientS3.S3Client;
 

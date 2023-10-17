@@ -41,8 +41,6 @@ class GCPStorage extends RemoteStorage {
       "utf8"
     );
     const credentials = JSON.parse(jsonFileContent.toString());
-    console.log("credentials", credentials)
-    console.log("options", options);
     const storage = new Storage({
       credentials
     })
@@ -107,7 +105,12 @@ class GCPStorage extends RemoteStorage {
 
   async getBuildInfo(buildId: string): Promise<ProjectBuildInfo> {
     const buildpath = this.getBuildPath(buildId);
-    const fileContent = await this.downloadFileFromGcp(`${buildpath}/info.json`);
+    let fileContent: string = "";
+    try {
+      fileContent = (await this.downloadFileFromGcp(`${buildpath}/info.json`)).toString();
+    }catch (e) {
+      throw new Error(`Build ${buildId} not found`);
+    }
     return JSON.parse(fileContent.toString());
   }
 

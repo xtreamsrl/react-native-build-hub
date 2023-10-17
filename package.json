@@ -7,8 +7,10 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "autoformat:staged": "pnpm dlx lint-staged",
+    "autoformat:staged": "lint-staged",
     "build": "lerna run build",
-    "publish": "lerna publish"
+    "version": "lerna version",
+    "version-publish": "lerna publish",
+    "publish:from-package": "lerna publish --from-package"
   }
 }

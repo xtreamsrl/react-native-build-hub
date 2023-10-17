@@ -1,3 +1,24 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 0.3.0 (2023-10-17)
+
+
+### Features
+
+* add aws support ([c2f06e8](https://github.com/xtreamsrl/react-native-build-hub/commit/c2f06e816dea74e9194d9d9f85e6f02884807ca0))
+* add azure remote ([ac1ff09](https://github.com/xtreamsrl/react-native-build-hub/commit/ac1ff09109ed164df2f99c8715d6b5d17950ed73))
+* add gcp support ([9561a28](https://github.com/xtreamsrl/react-native-build-hub/commit/9561a280493301dfa2f31ca86e2967329beb0e5a))
+* move to cli package folder ([0818e08](https://github.com/xtreamsrl/react-native-build-hub/commit/0818e0821eab12de59ddc583925672d81ea2b337))
+* rename packages and add lerna ([f1b378c](https://github.com/xtreamsrl/react-native-build-hub/commit/f1b378c5c2dbdf27649779c15748281f3853ce21))
+* separate azure remote in a package ([fb86537](https://github.com/xtreamsrl/react-native-build-hub/commit/fb86537aa33c6eeccc6c10818570d5a657eb0ab2))
+
+
+
+
+
 ## [0.1.1](https://github.com/xtreamsrl/react-native-incremental-cli/compare/v0.1.0...v0.1.1) (2023-04-21)
 
 
@@ -30,6 +51,3 @@
 * make flavor config optional for android ([0db2783](https://github.com/xtreamsrl/react-native-incremental-cli/commit/0db2783b66da613eff8e145f8b621f3e2e1fac50))
 * make flavor config optional for ios ([13ccee1](https://github.com/xtreamsrl/react-native-incremental-cli/commit/13ccee14fa42d66b788b0f1f79390ad33b144189))
 * remove build default flavor ([b9337c0](https://github.com/xtreamsrl/react-native-incremental-cli/commit/b9337c0b0b42312c4e391d74a27ab2414714b30a))
-
-
-

@@ -8,6 +8,7 @@
   "scripts": {
     "prepare": "husky install",
     "autoformat:staged": "pnpm dlx lint-staged",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "publish": "lerna publish"
   }
 }

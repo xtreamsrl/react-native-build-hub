@@ -6,10 +6,11 @@ import logger from '../application/logger';
 import { getBuildFolderByBuildId } from '../application/utils';
 import { ProjectConfiguration, updateCurrentBuildInFile } from '../application/cloud/projectsManagement';
 
-export async function updateCurrentBuild(buildId: string, config: ProjectConfiguration) {
+type RequestedBuildId = 'last' | string & {};
+export async function downloadBuildIfNotPresent(buildId: RequestedBuildId, config: ProjectConfiguration) {
   let buildIdToDownload: string;
 
-  if (buildId === 'last') {
+  if (buildId === "last") {
     const buildId = await getLastBuild(config);
     buildIdToDownload = buildId;
   } else {
@@ -21,6 +22,11 @@ export async function updateCurrentBuild(buildId: string, config: ProjectConfigu
   } else {
     await downloadBuild(buildIdToDownload, config);
   }
+  return buildIdToDownload;
+}
+
+export async function updateCurrentBuild(requestedBuildId: RequestedBuildId, config: ProjectConfiguration) {
+  let buildIdToDownload = await downloadBuildIfNotPresent(requestedBuildId, config);
 
   await makeCurrentBuild(buildIdToDownload);
 

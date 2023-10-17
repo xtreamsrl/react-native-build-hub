@@ -4,7 +4,7 @@ import { runApp as runIos } from '../application/runIos';
 import { startMetro, checkIsMetroRunning } from '../application/metroManager';
 import logger from '../application/logger';
 import { iosBuildPlatforms } from '../application/iosUtils';
-import { updateCurrentBuild } from './makeBuildCurrent';
+import { downloadBuildIfNotPresent, updateCurrentBuild } from "./makeBuildCurrent";
 import RemoteAwareCommand from '../_projectAwareCommand';
 
 export default class Run extends RemoteAwareCommand {
@@ -18,7 +18,7 @@ export default class Run extends RemoteAwareCommand {
     flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
     forceBuild: Flags.boolean({ aliases: ['fb', 'force-build'], description: 'Force a native rebuild' }),
-    buildId: Flags.string({ description: 'Specify the build id. Can be local, last or a buildId', default: 'local' }),
+    buildId: Flags.string({ description: 'Specify the build id. Can be local, last or a buildId', default: undefined }),
   };
 
   static args = {
@@ -32,17 +32,15 @@ export default class Run extends RemoteAwareCommand {
     const shouldRunIos = flags.ios ?? flags.all;
     const buildFlavor = flags.flavor;
     const forceBuild = flags.forceBuild;
-    const buildId = flags.buildId;
+    let buildId = flags.buildId;
 
     logger.setVerbose(flags.verbose);
     const start = performance.now();
     logger.info('Checking if metro is running...');
 
-    if (buildId !== 'local') {
+    if (buildId) {
       logger.info(`Requested to run specific id ${buildId}`);
-      // todo remote command only if needed?
-      // do we have to copy to local? can't we just run from build folder?
-      await updateCurrentBuild(buildId, this.currentProject);
+      buildId = await downloadBuildIfNotPresent(buildId, this.currentProject);
     }
 
     const isMetroRunning = await checkIsMetroRunning();
@@ -56,7 +54,7 @@ export default class Run extends RemoteAwareCommand {
 
     if (shouldRunAndroid) {
       logger.info(`Running android app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runAndroid(buildFlavor, undefined, forceBuild);
+      await runAndroid(buildFlavor, undefined, forceBuild, buildId);
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);

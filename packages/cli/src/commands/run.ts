@@ -38,6 +38,10 @@ export default class Run extends RemoteAwareCommand {
     const start = performance.now();
     logger.info('Checking if metro is running...');
 
+    if (buildId && forceBuild){
+      throw new Error('You cannot specify a buildId and force a rebuild at the same time');
+    }
+
     if (buildId) {
       logger.info(`Requested to run specific id ${buildId}`);
       buildId = await downloadBuildIfNotPresent(buildId, this.currentProject);
@@ -58,7 +62,7 @@ export default class Run extends RemoteAwareCommand {
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runIos(buildFlavor!, iosBuildPlatforms.simulator, forceBuild);
+      await runIos(buildFlavor!, iosBuildPlatforms.simulator, forceBuild, buildId);
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
     this.exit(0);

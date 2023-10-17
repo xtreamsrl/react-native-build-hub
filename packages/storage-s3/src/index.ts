@@ -152,7 +152,12 @@ class S3Storage extends RemoteStorage {
 
   async getBuildInfo(buildId: string): Promise<ProjectBuildInfo> {
     const buildpath = this.getBuildPath(buildId);
-    const fileContent = await this.downloadFileFromS3(`${buildpath}/info.json`);
+    let fileContent: string = "";
+    try {
+      fileContent = (await this.downloadFileFromS3(`${buildpath}/info.json`)).toString();
+    }catch (e) {
+      throw new Error(`Build ${buildId} not found`);
+    }
     return JSON.parse(fileContent.toString());
   }
 

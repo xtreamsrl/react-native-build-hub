@@ -15,5 +15,8 @@
   "dependencies": {
     "@types/node": "^18.18.4",
     "typescript": "^4.9.5"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

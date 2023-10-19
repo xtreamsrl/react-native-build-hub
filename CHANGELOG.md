@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.3.1...v0.4.0) (2023-10-19)
+
+
+### Features
+
+* improve error on missing build ([d4dc268](https://github.com/xtreamsrl/react-native-build-hub/commit/d4dc268a4f57e71c04644f2f81d659d000193979))
+* run android build directly from build folder ([343f9f2](https://github.com/xtreamsrl/react-native-build-hub/commit/343f9f214da767c4e00e5f8bf08b6ec56b3391e7))
+* run ios build directly from build folder ([8c35bb3](https://github.com/xtreamsrl/react-native-build-hub/commit/8c35bb3a83336276a820835883eeef2423e1cfb9))
+
+
+
+
+
 ## [0.3.1](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.3.0...v0.3.1) (2023-10-17)
 
 

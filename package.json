@@ -9,8 +9,7 @@
     "prepare": "husky install",
     "autoformat:staged": "lint-staged",
     "build": "lerna run build",
-    "version": "lerna version",
-    "version-publish": "lerna publish",
+    "lerna:version": "lerna version",
     "publish:from-package": "pnpm publish --access public"
   },
   "version": "0.5.0"

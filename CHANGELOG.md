@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.3.0...v0.5.0) (2023-10-26)
+
+
+### Bug Fixes
+
+* change remote config name ([c7a5283](https://github.com/xtreamsrl/react-native-build-hub/commit/c7a52832799f2be024825780f4b7effcc4e2ebca))
+
+
+### Features
+
+* add new init command ([ff6caa0](https://github.com/xtreamsrl/react-native-build-hub/commit/ff6caa045979b56b0a3b6e2a730302b8306651cc))
+* improve error on missing build ([24a33e4](https://github.com/xtreamsrl/react-native-build-hub/commit/24a33e4e4458321a46d5ea6fc77cd0fae32d602f))
+* run android build directly from build folder ([19453b3](https://github.com/xtreamsrl/react-native-build-hub/commit/19453b319343d5c20ecf346dd72be97f41ed952b))
+* run ios build directly from build folder ([9f505a1](https://github.com/xtreamsrl/react-native-build-hub/commit/9f505a12198cdf3c57a24901678cf78cc2773e10))
+
+
+
+
+
 # [0.4.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.3.1...v0.4.0) (2023-10-19)
 
 

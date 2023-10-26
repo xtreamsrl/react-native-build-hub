@@ -12,5 +12,6 @@
     "version": "lerna version",
     "version-publish": "lerna publish",
     "publish:from-package": "pnpm publish --access public"
-  }
+  },
+  "version": "0.1.0"
 }

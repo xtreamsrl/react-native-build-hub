@@ -1,10 +1,10 @@
-import { Args, Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import { runApp as runAndroid } from '../application/runAndroid';
 import { runApp as runIos } from '../application/runIos';
 import { startMetro, checkIsMetroRunning } from '../application/metroManager';
 import logger from '../application/logger';
 import { iosBuildPlatforms } from '../application/iosUtils';
-import { downloadBuildIfNotPresent, updateCurrentBuild } from "./makeBuildCurrent";
+import { downloadBuildIfNotPresent } from "./makeBuildCurrent";
 import RemoteAwareCommand from '../_projectAwareCommand';
 
 export default class Run extends RemoteAwareCommand {
@@ -18,7 +18,7 @@ export default class Run extends RemoteAwareCommand {
     flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
     forceBuild: Flags.boolean({ aliases: ['fb', 'force-build'], description: 'Force a native rebuild' }),
-    buildId: Flags.string({ description: 'Specify the build id. Can be local, last or a buildId', default: undefined }),
+    buildId: Flags.string({ aliases: ['id'], description: 'Specify the build id. Can be local, last or a buildId', default: undefined }),
   };
 
   static args = {

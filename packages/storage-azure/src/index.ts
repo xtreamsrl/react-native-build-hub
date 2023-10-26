@@ -20,7 +20,7 @@ const ENV_AZURE_AD_AUTH = "RNBH_AZURE_AD_AUTH";
 
 const getEnv = (key: string) => process.env[key];
 
-function getBlockBlobClient(filename: string, options: AzureBlobRunnerOptions) {
+function getBlockBlobClient(filename: string, options: AzureBlobRunnerOptions = {}) {
   const connectionString = getEnv(ENV_CONNECTION_STRING) ?? options.connectionString;
   const accountKey = getEnv(ENV_ACCOUNT_KEY) ?? options.accountKey;
   const accountName = getEnv(ENV_ACCOUNT_NAME) ?? options.accountName;
@@ -72,7 +72,7 @@ class AzureStorage extends RemoteStorage {
   private blob: (filename: string) => BlockBlobClient;
 
   // todo validate config
-  constructor(config: object) {
+  constructor(config?: object) {
     super();
     require("dotenv").config({ path: path.join(getProjectRootDir(), ".env") });
     this.blob = (filename: string) => getBlockBlobClient(filename, config);

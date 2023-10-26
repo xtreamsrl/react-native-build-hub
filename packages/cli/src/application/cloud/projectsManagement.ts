@@ -12,7 +12,7 @@ export type RemoteConfig = {
 export type ProjectConfiguration = {
   remote: RemoteConfig;
   // this should not stay at project level because it indicates the build that the user has locally
-  currentBuildId: string | null;
+  currentBuildId?: string | null;
 };
 
 

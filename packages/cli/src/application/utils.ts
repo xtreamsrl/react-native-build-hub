@@ -23,12 +23,15 @@ export function executeCommandAsync(command: string, options?: ExecSyncOptionsWi
   return execAsync(command, options);
 }
 
+export function getRootDestinationFolderBaseName() {
+  return ".rn-buildhub";
+}
 export function getRootDestinationFolder() {
-  return path.join(getProjectRootDir(), ".rn-build-hub");
+  return path.join(getProjectRootDir(), getRootDestinationFolderBaseName());
 }
 
 export function getConfigFile() {
-  return path.join(getProjectRootDir(), ".rn-build-hub.json");
+  return path.join(getProjectRootDir(), ".rn-buildhub.json");
 }
 
 export function getProjectRootDir() {

@@ -36,7 +36,11 @@ function checkBuildPresent(buildType: string, target: {
   return fs.existsSync(destination);
 }
 
-function installApp(deviceUdid: string, buildType: string, target:  { ext: string; buildCmd: string; name: string }, buildId?: string) {
+function installApp(deviceUdid: string, buildType: string, target: {
+  ext: string;
+  buildCmd: string;
+  name: string
+}, buildId?: string) {
   const { destination } = getIosBuildDestination(target, buildType, buildId);
   const res = childProcess.execSync(`xcrun simctl install ${deviceUdid} ${destination}`, { encoding: "utf-8" });
 }
@@ -82,6 +86,26 @@ async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]>
   return devices;
 }
 
+function waitForBootedDeviceOrTimeout() {
+  return new Promise<void>((resolve, reject) => {
+    let interval: NodeJS.Timeout | undefined;
+    let timeout = setTimeout(() => {
+      if (interval) clearInterval(interval);
+      reject("timeout");
+    }, 20_000);
+    interval = setInterval(() => {
+      let devices = getDevices();
+      let bootedDevices = getBootedDevices(devices);
+      if (bootedDevices.length > 0) {
+        clearInterval(interval);
+        executeCommand(`xcrun simctl bootstatus ${bootedDevices[0].udid}`, { stdio: "ignore" });
+        clearTimeout(timeout);
+        resolve();
+      }
+    }, 2_000);
+  });
+}
+
 export async function runApp(
   buildType?: string,
   iosPlatform: IosPlatform = iosBuildPlatforms.simulator,
@@ -100,7 +124,7 @@ export async function runApp(
     logger.info("Build already present, skipping build");
   }
 
-  const devices = getDevices();
+  let devices = getDevices();
 
   if (devices.length === 0) {
     throw new Error("No iOS devices available");
@@ -108,6 +132,12 @@ export async function runApp(
 
   // todo improve run on device
   executeCommand("open -a Simulator");
+  try {
+    await waitForBootedDeviceOrTimeout();
+
+  } catch (e) {
+  }
+  devices = getDevices();
 
   let bootedDevices = getBootedDevices(devices);
 

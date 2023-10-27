@@ -8,47 +8,26 @@ A storage implementation for **React Native Build Hub** that uses Google Cloud S
 npm install --save-dev @rn-buildhub/gcp-storage
 ```
 
-### Service Account Creation
+### Configuration Details
 
-It's recommended to generate a service account with exclusive permissions.
+Just use a `.env` file in the root of your project to set some of the following environment variables
+or populate the `remote.config` object in your `rn-buildhub.json` file.
 
-## Configuration
+| Parameter                   | Description                                      | Environment Variable / .env |
+|-----------------------------|--------------------------------------------------|-----------------------------|
+| Google Service Account file | The json file of the service account credentials | `RNBH_GOOGLE_APPLICATION_CREDENTIALS`          | 
+| Bucket Name                 | Name of the bucket for cache storage.            | `RNBH_GCP_BUCKET`      |
 
-Keep in mind that environment variables take precedence over configuration settings.
 
-In addition to the above, all parameters outlined in [rn-buildhub-storage-interface](https://www.npmjs.com/package/rn-buildhub-storage-interface) apply here.
+## Guides
 
-| Parameter              | Description                                   | Environment Variable / .env | `rn-buildhub.json`    |
-|------------------------|-----------------------------------------------|-----------------------------|-----------------------|
-| Google Project         | The name of the Google Cloud project.         | `RNBH_GCP_PROJECT`          | `googleProject`       |
-| Bucket Name            | Name of the bucket for cache storage.         | `RNBH_GCP_BUCKET_NAME`      | `bucketName`          |
-| Read from Remote Cache | Toggle to permit reading from the remote cache.| `RNBH_READ`                 | `read` (true/false)   |
-| Write to Remote Cache  | Toggle to allow writing to the remote cache.  | `RNBH_WRITE`                | `write` (true/false)  |
+[🔗 How to create a Google Cloud Storage_Bucket](https://cloud.google.com/storage/docs/creating-buckets)
+[🔗 Create a service account to access your data](https://www.bizstats.ai/_/analytics-ai/user-guide/connections/google-cloud/google-storage/grant-permission/)
 
-### Sample Configuration
-```json
-{
-   "tasksRunnerOptions": {
-      "default": {
-         "runner": "@rn-buildhub/gcp-storage",
-         "options": {
-            "googleProject": "my-google-project-id",
-            "bucketName": "my-rn-buildhub-cache-bucket",
-            "read": true,
-            "write": false
-         }
-      }
-   }
-}
-```
+## See Also
 
-## Running 🚀
-
-Upon executing tasks, the console will show activity indicating storage or retrieval from the Google Cloud bucket:
-
-```
-------------------------------------------------------------------------------
-Remote cache hit: Google Cloud Bucket
-File: 1fb268062785d739b5a43c1e4032fd7731c6080e2249e87a00e568b3c41acf9c.tar.gz
-------------------------------------------------------------------------------
-```
+| Package                                                          | Storage              |
+|------------------------------------------------------------------|----------------------|
+| [@rn-buildhub/s3-storage](../storage-s3/README.md)               | Amazon Web Services  |
+| [@rn-buildhub/azure-storage](../storage-azure/README.md)         | Azure Cloud Platform |
+| [@rn-buildhub/storage-interface](../storage-interface/README.md) | Abstract storage     |

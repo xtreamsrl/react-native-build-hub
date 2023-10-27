@@ -10,6 +10,7 @@ npm install --save-dev @rn-buildhub/azure-storage
 
 ### Configuration Details
 Just use a `.env` file in the root of your project to set some of the following environment variables
+or populate the `remote.config` object in your `rn-buildhub.json` file.
 
 | Parameter         | Description                                                  | Environment Variable / .env    |
 |-------------------|--------------------------------------------------------------|--------------------------------|

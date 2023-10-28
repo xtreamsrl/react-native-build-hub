@@ -1,0 +1,87 @@
+name: Build current RN Scaffold
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  android-build:
+    name: Android Build
+    runs-on: macOS-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up our JDK environment
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Pnpm setup
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.12
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install deps
+        run: pnpm install
+
+      - name: Build Rn Build Hub
+        run: pnpm build
+
+      - name: Create a new rn project
+        run: npx react-native@latest init TestProject --skip-install
+
+      - name: Install deps
+        run: pnpm install
+        working-directory: ./TestProject
+
+      - name: Install rn build hub cli
+        run: npm i ../packages/cli
+        working-directory: ./TestProject
+
+      - name: Install rn build azure
+        run: npm i ../packages/storage-azure
+        working-directory: ./TestProject
+
+      - name: Init build hub
+        run: ./node_modules/.bin/rnbh init --remote=azure
+        working-directory: ./TestProject
+
+      - name: Run build
+        run: ./node_modules/.bin/rnbh build -a
+        working-directory: ./TestProject
+
+      - name: Upload build
+        run: ./node_modules/.bin/rnbh build:upload
+        working-directory: ./TestProject
+        env:
+          RNBH_AZURE_CONTAINER: ${{ secrets.RNBH_AZURE_CONTAINER }}
+          RNBH_AZURE_CONNECTION_STRING: ${{ secrets.RNBH_AZURE_CONNECTION_STRING }}
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: cd ./TestProject && ./node_modules/.bin/rnbh run -a --buildId=last
+        env:
+          RNBH_AZURE_CONTAINER: ${{ secrets.RNBH_AZURE_CONTAINER }}
+          RNBH_AZURE_CONNECTION_STRING: ${{ secrets.RNBH_AZURE_CONNECTION_STRING }}
+
+
+
+

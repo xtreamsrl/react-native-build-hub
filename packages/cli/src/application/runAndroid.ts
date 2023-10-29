@@ -1,6 +1,6 @@
 import childProcess, { execSync } from 'child_process';
 import fs from 'fs';
-import { getAppName, getProjectRootDir, getRootDestinationFolder, launchEmulator } from "./utils";
+import { getAppName, getProjectRootDir, getRootDestinationFolder, launchEmulator } from './utils';
 import listAndroidDevices from '@react-native-community/cli-platform-android/build/commands/runAndroid/listAndroidDevices';
 import tryRunAdbReverse from '@react-native-community/cli-platform-android/build/commands/runAndroid/tryRunAdbReverse';
 import adb from '@react-native-community/cli-platform-android/build/commands/runAndroid/adb';
@@ -8,7 +8,15 @@ import _getAdbPath from '@react-native-community/cli-platform-android/build/comm
 import { buildAndroid } from './buildAndroid';
 import { checkBuildPresent, getAppBuildFolder } from './androidUtils';
 import path from 'path';
+import os from 'os';
 import logger from './logger';
+
+type DeviceData = {
+  deviceId: string | undefined;
+  readableName: string;
+  connected: boolean;
+  type: 'emulator' | 'phone';
+};
 
 function getAdbPath() {
   const androidHome = process.env.ANDROID_HOME;
@@ -47,7 +55,7 @@ export function findBestApkInFolder(dir: string, arc?: string) {
   }
 }
 
-function installApp(device: string, engineDir: string, buildType?: string, buildId?:string) {
+function installApp(device: string, engineDir: string, buildType?: string, buildId?: string) {
   const appDir = getAppBuildFolder(buildType, false, buildId);
 
   const cpu = adb.getCPU(getAdbPath(), device);
@@ -58,7 +66,9 @@ function installApp(device: string, engineDir: string, buildType?: string, build
 }
 
 function launchApp(device: string, packageId: string) {
-  execSync(`${getAdbPath()} -s ${device} shell monkey -p ${packageId} -c android.intent.category.LAUNCHER 1`);
+  execSync(`${getAdbPath()} -s ${device} shell monkey -p ${packageId} -c android.intent.category.LAUNCHER 1`, {
+    stdio: 'ignore',
+  });
 }
 
 async function getAvailableDevicePort(port = 5552): Promise<number> {
@@ -84,7 +94,13 @@ function getBundleIdentifier(appBuildFolder: string): string {
   return 'todo';
 }
 
-function installAndLaunch(port: string, deviceId: string, buildType: string | undefined, appIdentifier: string, buildId?: string) {
+function installAndLaunch(
+  port: string,
+  deviceId: string,
+  buildType: string | undefined,
+  appIdentifier: string,
+  buildId?: string,
+) {
   tryRunAdbReverse(port, deviceId);
 
   logger.info('Installing app...');
@@ -93,10 +109,55 @@ function installAndLaunch(port: string, deviceId: string, buildType: string | un
   launchApp(deviceId, appIdentifier);
 }
 
+function getRunningDeviceIds() {
+  return adb.getDevices(getAdbPath());
+}
+
+function getPhoneName(deviceId: string) {
+  const adbPath = getAdbPath();
+  const buffer = execSync(`${adbPath} -s ${deviceId} shell getprop | grep ro.product.model`, { stdio: 'ignore' });
+  return buffer
+    .toString()
+    .replace(/\[ro\.product\.model\]:\s*\[(.*)\]/, '$1')
+    .trim();
+}
+
+function getEmulatorName(deviceId: string) {
+  const adbPath = getAdbPath();
+  const buffer = execSync(`${adbPath} -s ${deviceId} emu avd name`);
+
+  // 1st line should get us emu name
+  return buffer
+    .toString()
+    .split(os.EOL)[0]
+    .replace(/(\r\n|\n|\r)/gm, '')
+    .trim();
+}
+
+function getRunningDevices(): DeviceData[] {
+  return getRunningDeviceIds().map(deviceId => {
+    if (deviceId.includes('emulator')) {
+      return {
+        deviceId,
+        readableName: getEmulatorName(deviceId),
+        connected: true,
+        type: 'emulator' as const,
+      };
+    } else {
+      return {
+        deviceId,
+        readableName: getPhoneName(deviceId),
+        type: 'phone' as const,
+        connected: true,
+      };
+    }
+  });
+}
+
 export async function runApp(buildFlavor?: string, port = '8081', forceBuild?: boolean, buildId?: string) {
-  if (forceBuild || !checkBuildPresent(buildFlavor,false, buildId)) {
+  if (forceBuild || !checkBuildPresent(buildFlavor, false, buildId)) {
     logger.info('Build not present, starting build');
-    if(buildId) {
+    if (buildId) {
       throw new Error(`The requested build id ${buildId} does not contain an android build for flavor ${buildFlavor}`);
     }
     await buildAndroid(buildFlavor);
@@ -104,8 +165,15 @@ export async function runApp(buildFlavor?: string, port = '8081', forceBuild?: b
     logger.info('Build already present, skipping build');
   }
 
-  // todo improvement: if there is only one device, use it directly
-  const device = await listAndroidDevices();
+  let device: DeviceData | undefined;
+  const runningDevices = getRunningDevices();
+
+  if (runningDevices.length === 1) {
+    device = runningDevices[0];
+    logger.info(`Using running device ${device.readableName}`);
+  } else {
+    device = await listAndroidDevices();
+  }
 
   const appIdentifier = getBundleIdentifier(getAppBuildFolder(buildFlavor, false, buildId));
 

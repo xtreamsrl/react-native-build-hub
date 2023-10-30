@@ -41,7 +41,9 @@ emulator. It also supports multiple flavors/schemas.
 You can always choose to force a native build when running the app. In the future, the cli tool may
 add some heuristics to decide when to force the native build.
 
-![Run android with build cached](./packages/cli/docs/assets/run-android-build-cached.png)
+<p align="center">
+<img src="./packages/cli/docs/assets/run-android-build-cached.png" width="70%" align="center">
+</p>
 
 ⚠️ Disclaimer
 ============

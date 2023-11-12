@@ -126,6 +126,7 @@ npx @rn-buildhub/cli run [-a|-i] [-f|--flavor flavor] [--force-build] [--buildId
 - `-f/--flavor`: specify the flavor/schema
 - `--id/--buildId`: The build id stored in the remote storage to run
 - `--fb/--force-build`: force a native build ignoring the cache
+- `--ios-platform`: specify "device" or "simulator", default to "simulator"
 
 ### Build
 
@@ -143,6 +144,7 @@ The build output will be stored in the cache folder `.rn-buildhub`.
 - `-i/--ios`: build for iOS
 - `-a/--android`: build for Android
 - `-f/--flavor`: specify the flavor/schema
+- `--ios-platform`: specify "device" or "simulator", default to "simulator"
 
 ### Upload Build
 

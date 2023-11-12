@@ -4,7 +4,7 @@ import { runApp as runIos } from '../application/runIos';
 import { startMetro, checkIsMetroRunning } from '../application/metroManager';
 import logger from '../application/logger';
 import { iosBuildPlatforms } from '../application/iosUtils';
-import { downloadBuildIfNotPresent } from "./makeBuildCurrent";
+import { downloadBuildIfNotPresent } from './makeBuildCurrent';
 import RemoteAwareCommand from '../_projectAwareCommand';
 
 export default class Run extends RemoteAwareCommand {
@@ -17,8 +17,17 @@ export default class Run extends RemoteAwareCommand {
     ios: Flags.boolean({ char: 'i', description: 'Run the ios app' }),
     flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
+    iosPlatform: Flags.string({
+      description: 'Specify the ios platform to run on',
+      options: ['simulator', 'device'],
+      default: 'simulator',
+    }),
     forceBuild: Flags.boolean({ aliases: ['fb', 'force-build'], description: 'Force a native rebuild' }),
-    buildId: Flags.string({ aliases: ['id'], description: 'Specify the build id. Can be local, last or a buildId', default: undefined }),
+    buildId: Flags.string({
+      aliases: ['id'],
+      description: 'Specify the build id. Can be local, last or a buildId',
+      default: undefined,
+    }),
   };
 
   static args = {
@@ -33,12 +42,13 @@ export default class Run extends RemoteAwareCommand {
     const buildFlavor = flags.flavor;
     const forceBuild = flags.forceBuild;
     let buildId = flags.buildId;
+    let iosPlatform = flags.iosPlatform === 'simulator' ? iosBuildPlatforms.simulator : iosBuildPlatforms.iphone;
 
     logger.setVerbose(flags.verbose);
     const start = performance.now();
     logger.info('Checking if metro is running...');
 
-    if (buildId && forceBuild){
+    if (buildId && forceBuild) {
       throw new Error('You cannot specify a buildId and force a rebuild at the same time');
     }
 
@@ -62,7 +72,7 @@ export default class Run extends RemoteAwareCommand {
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runIos(buildFlavor!, iosBuildPlatforms.simulator, forceBuild, buildId);
+      await runIos(buildFlavor!, iosPlatform, forceBuild, buildId);
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
     this.exit(0);

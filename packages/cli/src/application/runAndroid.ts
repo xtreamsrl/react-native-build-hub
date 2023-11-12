@@ -116,6 +116,9 @@ function getRunningDeviceIds() {
 function getPhoneName(deviceId: string) {
   const adbPath = getAdbPath();
   const buffer = execSync(`${adbPath} -s ${deviceId} shell getprop | grep ro.product.model`, { stdio: 'ignore' });
+  if (!buffer) {
+    return 'unknown';
+  }
   return buffer
     .toString()
     .replace(/\[ro\.product\.model\]:\s*\[(.*)\]/, '$1')

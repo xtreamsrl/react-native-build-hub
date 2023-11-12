@@ -21,6 +21,11 @@ export default class Build extends Command {
     flavor: Flags.string({ char: 'f', description: 'Specify flavor to build' }),
     release: Flags.boolean({ description: 'Optimized release build', default: false }),
     incremental: Flags.boolean({ char: 'I', description: 'Incremental build', default: false }),
+    iosPlatform: Flags.string({
+      description: 'Specify the ios platform to run on',
+      options: ['simulator', 'device'],
+      default: 'simulator',
+    }),
   };
 
   public async run(): Promise<void> {
@@ -31,12 +36,13 @@ export default class Build extends Command {
     const buildFlavor = flags.flavor;
     const release = flags.release;
     const incremental = flags.incremental;
+    let iosPlatform = flags.iosPlatform === 'simulator' ? iosBuildPlatforms.simulator : iosBuildPlatforms.iphone;
 
     const start = performance.now();
 
     if (shouldBuildIos) {
       logger.info('Building ios app');
-      buildIos(buildFlavor, iosBuildPlatforms.simulator);
+      buildIos(buildFlavor, iosPlatform);
     }
     if (shouldBuildAndroid) {
       logger.info('Building android');

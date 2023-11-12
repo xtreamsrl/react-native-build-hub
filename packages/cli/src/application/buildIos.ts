@@ -46,15 +46,21 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
     executeCommand(copyCommand);
     return destination;
   } else {
-    // archive
-    // todo
+    const ipaFolder = path.join(iosFolder, 'build', 'Products', 'IPA');
     const generateIpaCommand = `xcodebuild -exportArchive \
       -archivePath '${archivePath}' \
-      -exportPath "${iosFolder}/build/Products/IPA" \
+      -exportPath "${ipaFolder}" \
       -exportOptionsPlist ${iosFolder}/${appName}/info.plist \
       -allowProvisioningUpdates
     `;
     executeCommand(generateIpaCommand);
+    const { destinationDir, destination } = getIosBuildDestination(platform, buildFlavor.flavorDir);
+    executeCommand(`mkdir -p ${destinationDir}`);
+    executeCommand(`rm -rf ${destination}`);
+    const copyCommand = `cp -a '${ipaFolder}' '${destination}'`;
+    executeCommand(copyCommand);
+    executeCommand(`rm -rf ${ipaFolder}`);
+    return destination;
   }
 }
 

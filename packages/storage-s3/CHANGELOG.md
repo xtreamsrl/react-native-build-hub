@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.7.0 (2023-11-12)
+
+
+### Bug Fixes
+
+* change remote config name ([a9893db](https://github.com/xtreamsrl/react-native-build-hub/commit/a9893db54d2671e70c71dc21b2dfefee303c1883))
+
+
+### Features
+
+* add aws support ([c2f06e8](https://github.com/xtreamsrl/react-native-build-hub/commit/c2f06e816dea74e9194d9d9f85e6f02884807ca0))
+* improve error on missing build ([360485b](https://github.com/xtreamsrl/react-native-build-hub/commit/360485ba74c7b0291278ef91c024b3b1be63565b))
+
+
+
+
+
 # [0.6.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.5.0...v0.6.0) (2023-10-26)
 
 **Note:** Version bump only for package @rn-buildhub/s3-storage

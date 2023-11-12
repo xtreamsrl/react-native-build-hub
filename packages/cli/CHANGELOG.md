@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.7.0 (2023-11-12)
+
+
+### Bug Fixes
+
+* improve simulator boot detection ([a525f2a](https://github.com/xtreamsrl/react-native-build-hub/commit/a525f2a0ec6761070355c8fe07013ff6a97b9812))
+
+
+### Features
+
+* add android running device detection and usage ([cd004a4](https://github.com/xtreamsrl/react-native-build-hub/commit/cd004a41f3de168a65c5b9faf8a84fcd6d4352fa))
+* add aws support ([c2f06e8](https://github.com/xtreamsrl/react-native-build-hub/commit/c2f06e816dea74e9194d9d9f85e6f02884807ca0))
+* add azure remote ([ac1ff09](https://github.com/xtreamsrl/react-native-build-hub/commit/ac1ff09109ed164df2f99c8715d6b5d17950ed73))
+* add gcp support ([acefdcd](https://github.com/xtreamsrl/react-native-build-hub/commit/acefdcd25b01e78fccf0525b26f3287b6b362d2b))
+* add new init command ([7b54a32](https://github.com/xtreamsrl/react-native-build-hub/commit/7b54a321a1447907fc697a73958205e7cbc3e24b))
+* add support for ios device build and run ([4daa353](https://github.com/xtreamsrl/react-native-build-hub/commit/4daa35312a63d90378334e8770f625a288d42a0e))
+* move to cli package folder ([0818e08](https://github.com/xtreamsrl/react-native-build-hub/commit/0818e0821eab12de59ddc583925672d81ea2b337))
+* rename packages and add lerna ([f1b378c](https://github.com/xtreamsrl/react-native-build-hub/commit/f1b378c5c2dbdf27649779c15748281f3853ce21))
+* run android build directly from build folder ([aa25a73](https://github.com/xtreamsrl/react-native-build-hub/commit/aa25a7343c41a558950afea2dd59ef5994e68f61))
+* run ios build directly from build folder ([850de25](https://github.com/xtreamsrl/react-native-build-hub/commit/850de2524ff7064f72da18dd52651969a2b02c26))
+* separate azure remote in a package ([fb86537](https://github.com/xtreamsrl/react-native-build-hub/commit/fb86537aa33c6eeccc6c10818570d5a657eb0ab2))
+
+
+
+
+
 # [0.6.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.5.0...v0.6.0) (2023-10-26)
 
 **Note:** Version bump only for package @rn-buildhub/cli

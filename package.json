@@ -10,7 +10,7 @@
     "autoformat:staged": "lint-staged",
     "build": "lerna run build",
     "lerna:version": "lerna version",
-    "publish:from-package": "pnpm publish --access public"
+    "publish:from-package": "pnpm -r publish --access public"
   },
   "private": true,
   "version": "0.5.0"

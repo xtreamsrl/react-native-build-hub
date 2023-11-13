@@ -151,6 +151,15 @@ export function getAvailableCurrentBuilds() {
           type: 'debug',
           path: debugBuildPath,
         });
+      }else if( fs.existsSync(debugBuildPath) && deviceType === iosBuildPlatforms.iphone.name){
+        iosBuilds.push({
+          device: 'iphoneos',
+          flavor: flavor.join('-'),
+          release: false,
+          debug: true,
+          type: 'debug',
+          path: debugBuildPath,
+        });
       }
     }
   }

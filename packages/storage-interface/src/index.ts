@@ -3,7 +3,7 @@ function createBuildId(): string {
 }
 
 export type Build = {
-  device: "all" | "iphonesimulator";
+  device: "all" | "iphonesimulator" | "iphoneos";
   flavor: string;
   release: boolean;
   debug: boolean;
@@ -33,9 +33,9 @@ export abstract class RemoteStorage {
     iosBuilds: Build[];
   }): Promise<void>;
 
-
   abstract getBuildInfo(buildId: string): Promise<ProjectBuildInfo>;
 
   abstract upload(buildId: string, buffer: Buffer, fileName: string): Promise<string>;
+
   abstract download(path: string): Promise<Buffer>;
 }

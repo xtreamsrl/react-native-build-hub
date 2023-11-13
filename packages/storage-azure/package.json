@@ -1,6 +1,6 @@
 {
   "name": "@rn-buildhub/azure-storage",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Azure Storage implementation for @rn-buildhub/storage-interface",
   "main": "dist/index.js",
   "module": "dist/index.js",

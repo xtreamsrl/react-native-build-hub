@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.7.1...v0.7.2) (2023-11-13)
+
+
+### Bug Fixes
+
+* update ios platform detection ([890b4a9](https://github.com/xtreamsrl/react-native-build-hub/commit/890b4a9393d06fcf6af47b4b876d68e741249257))
+
+
+
+
+
 ## [0.7.1](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.7.0...v0.7.1) (2023-11-13)
 
 

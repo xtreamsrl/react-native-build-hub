@@ -19,9 +19,28 @@ type Device = {
   type: 'simulator' | 'device'; // todo
 };
 
+export interface SimulatorDeviceType {
+  lastBootedAt: string
+  dataPath: string
+  dataPathSize: number
+  logPath: string
+  udid: string
+  isAvailable: boolean
+  logPathSize: number
+  deviceTypeIdentifier: string
+  state: 'Booted' | 'shutdown'
+  name: string
+}
+
+
 function getIosSimulatorsDevices(): Device[] {
   const devicesJson = JSON.parse(childProcess.execSync('xcrun simctl list -j devices', { encoding: 'utf-8' }));
-  return Object.values(devicesJson.devices).flat() as Device[];
+  return (Object.values(devicesJson.devices).flat() as SimulatorDeviceType[]).map(d=>({
+    type: 'simulator',
+    state: d.state,
+    udid: d.udid,
+    name: d.name,
+  }));
 }
 
 function getIosPhysicalDevices(): Device[] {
@@ -149,7 +168,7 @@ export async function runApp(
   }
 
   let devices: Device[] = [];
-  if (iosPlatform.name === 'simulator') {
+  if (iosPlatform.name === iosBuildPlatforms.simulator.name) {
     devices = getIosSimulatorsDevices();
   } else {
     devices = getIosPhysicalDevices();
@@ -159,7 +178,7 @@ export async function runApp(
     throw new Error('No iOS devices available');
   }
 
-  if (iosPlatform.name === 'simulator') {
+  if (iosPlatform.name === iosBuildPlatforms.simulator.name) {
     // todo improve run on device
     executeCommand('open -a Simulator');
     try {

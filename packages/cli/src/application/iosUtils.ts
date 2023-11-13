@@ -12,12 +12,16 @@ export const iosBuildPlatforms = {
     ext: "ipa",
     buildCmd: "archive"
   }
-};
+} as const;
 
 export type IosPlatform = {
-  name: string;
-  ext: string;
-  buildCmd: string;
+  name: 'iphonesimulator';
+  ext: 'app';
+  buildCmd: 'build';
+} | {
+  name: "iphoneos",
+  ext: "ipa",
+  buildCmd: "archive"
 };
 
 export function getIosBuildDestination(platform: {

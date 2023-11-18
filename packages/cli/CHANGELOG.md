@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.7.2...v0.8.0) (2023-11-18)
+
+
+### Features
+
+* support ios 17 launch ([ad89da9](https://github.com/xtreamsrl/react-native-build-hub/commit/ad89da993b4f64b43dc3bb603d0eb9be3633fdb5))
+
+
+
+
+
 ## [0.7.2](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.7.1...v0.7.2) (2023-11-13)
 
 

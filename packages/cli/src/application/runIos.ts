@@ -17,29 +17,29 @@ type Device = {
   name: string;
   udid: string;
   type: 'simulator' | 'device'; // todo
+  iosVersion?: string;
 };
 
 export interface SimulatorDeviceType {
-  lastBootedAt: string
-  dataPath: string
-  dataPathSize: number
-  logPath: string
-  udid: string
-  isAvailable: boolean
-  logPathSize: number
-  deviceTypeIdentifier: string
-  state: 'Booted' | 'shutdown'
-  name: string
+  lastBootedAt: string;
+  dataPath: string;
+  dataPathSize: number;
+  logPath: string;
+  udid: string;
+  isAvailable: boolean;
+  logPathSize: number;
+  deviceTypeIdentifier: string;
+  state: 'Booted' | 'shutdown';
+  name: string;
 }
-
 
 function getIosSimulatorsDevices(): Device[] {
   const devicesJson = JSON.parse(childProcess.execSync('xcrun simctl list -j devices', { encoding: 'utf-8' }));
-  return (Object.values(devicesJson.devices).flat() as SimulatorDeviceType[]).map(d=>({
+  return (Object.values(devicesJson.devices).flat() as SimulatorDeviceType[]).map(d => ({
     type: 'simulator',
     state: d.state,
     udid: d.udid,
-    name: d.name,
+    name: d.name
   }));
 }
 
@@ -53,6 +53,7 @@ function getIosPhysicalDevices(): Device[] {
         name: d.name,
         udid: d.udid,
         type: 'device',
+        iosVersion: d.version
       };
     });
 }
@@ -68,28 +69,48 @@ function checkBuildPresent(
     buildCmd: string;
     name: string;
   },
-  buildId?: string,
+  buildId?: string
 ) {
   const { destination } = getIosBuildDestination(target, buildType, buildId);
   return fs.existsSync(destination);
 }
 
+function isVersionGreaterThen17(iosVersion: string) {
+  return parseInt(iosVersion) >= 17;
+}
+
 function installApp(device: Device, destination: string) {
   if (device.type === 'device') {
-    const ipaFile = fs.readdirSync(destination).find(f => f.endsWith('.ipa'));
-    if (!ipaFile) {
-      throw new Error('No ipa file found');
+    if (device.iosVersion && isVersionGreaterThen17(device.iosVersion)) {
+      // for ios version greater or equal 17 ios-deploy is not supporter we need to use the
+      // new devicectl tool inside xcrun
+      childProcess.execSync(`xcrun devicectl device install app --device ${device.udid} ${destination}`);
+    } else {
+      childProcess.execSync(`ios-deploy ${device.udid} --debug --bundle ${destination}`, {
+        encoding: 'utf-8'
+      });
     }
-    childProcess.execSync(`ios-deploy ${device.udid} --debug --bundle ${path.join(destination, ipaFile)}`, {
-      encoding: 'utf-8',
-    });
+
   } else {
     const res = childProcess.execSync(`xcrun simctl install ${device.udid} ${destination}`, { encoding: 'utf-8' });
   }
 }
 
-function launchApp(deviceUid: string, bundleId: string) {
-  childProcess.execSync(`xcrun simctl launch ${deviceUid} ${bundleId}`);
+function launchApp(device: Device, bundleId: string,  destination: string) {
+  console.log(device);
+  if (device.type === 'device') {
+    if (device.iosVersion && isVersionGreaterThen17(device.iosVersion)) {
+      // for ios version greater or equal 17 ios-deploy is not supporter we need to use the
+      // new devicectl tool inside xcrun
+      console.log(`xcrun devicectl device process launch --device ${device.udid} ${bundleId}`)
+      childProcess.execSync(`xcrun devicectl device process launch --device ${device.udid} ${bundleId}`);
+    } else {
+      // do nothing, ios-deploy will already launch the application
+    }
+
+  } else {
+    childProcess.execSync(`xcrun simctl launch ${device.udid} ${bundleId}`);
+  }
 }
 
 function isErrorWithStderr(e: unknown): e is { stderr: { toString(): string } } {
@@ -122,9 +143,9 @@ async function promptForDeviceSelection(allDevices: Device[]): Promise<Device[]>
       title: `${chalk.bold(`(${d.type})`)} ${chalk.green(`${d.name}`)} (${
         d.state === 'Booted' ? 'connected' : 'disconnected'
       })`,
-      value: d,
+      value: d
     })),
-    min: 1,
+    min: 1
   });
   return devices;
 }
@@ -153,7 +174,7 @@ export async function runApp(
   buildType?: string,
   iosPlatform: IosPlatform = iosBuildPlatforms.simulator,
   forceBuild?: boolean,
-  buildId?: string,
+  buildId?: string
 ) {
   const buildFlavor = getIosFlavors(buildType);
 
@@ -183,7 +204,8 @@ export async function runApp(
     executeCommand('open -a Simulator');
     try {
       await waitForBootedSimulatorOrTimeout();
-    } catch (e) {}
+    } catch (e) {
+    }
     devices = getIosSimulatorsDevices();
   }
 
@@ -208,17 +230,14 @@ export async function runApp(
   const { destination } = getIosBuildDestination(iosPlatform, buildFlavor.scheme, buildId);
 
   for (const device of devicesToRun) {
-    const id = device.udid;
     installApp(device, destination);
-    if (device.type === 'simulator') {
-      const bundleID = execFileSync(
-        '/usr/libexec/PlistBuddy',
-        ['-c', 'Print:CFBundleIdentifier', path.join(destination, 'Info.plist')],
-        {
-          encoding: 'utf8',
-        },
-      ).trim();
-      launchApp(id, bundleID);
-    }
+    const bundleID = execFileSync(
+      '/usr/libexec/PlistBuddy',
+      ['-c', 'Print:CFBundleIdentifier', path.join(destination, 'Info.plist')],
+      {
+        encoding: 'utf8'
+      }
+    ).trim();
+    launchApp(device, bundleID, destination);
   }
 }

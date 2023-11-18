@@ -34,7 +34,6 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
 
   executeCommand(buildCommand);
 
-  if (platform.buildCmd === 'build') {
     // todo handle Debug/release
     const appFolder = getBuildFolder(getAppName(), false, buildFlavor.flavorDir, platform.name);
     const source = `${iosFolder}/DerivedData/${appName}/build/Products/Debug-${platform.name}/${appFolder}`;
@@ -45,23 +44,7 @@ function _buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms
     const copyCommand = `cp -a '${source}' '${destination}'`;
     executeCommand(copyCommand);
     return destination;
-  } else {
-    const ipaFolder = path.join(iosFolder, 'build', 'Products', 'IPA');
-    const generateIpaCommand = `xcodebuild -exportArchive \
-      -archivePath '${archivePath}' \
-      -exportPath "${ipaFolder}" \
-      -exportOptionsPlist ${iosFolder}/${appName}/info.plist \
-      -allowProvisioningUpdates
-    `;
-    executeCommand(generateIpaCommand);
-    const { destinationDir, destination } = getIosBuildDestination(platform, buildFlavor.flavorDir);
-    executeCommand(`mkdir -p ${destinationDir}`);
-    executeCommand(`rm -rf ${destination}`);
-    const copyCommand = `cp -a '${ipaFolder}' '${destination}'`;
-    executeCommand(copyCommand);
-    executeCommand(`rm -rf ${ipaFolder}`);
-    return destination;
-  }
+
 }
 
 export function buildIos(buildType?: string, platform: IosPlatform = iosBuildPlatforms.simulator) {

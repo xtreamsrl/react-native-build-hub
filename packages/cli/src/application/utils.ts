@@ -11,7 +11,7 @@ import getAdbPath from '@react-native-community/cli-platform-android/build/comma
 const execAsync = util.promisify(require('child_process').exec);
 
 export function executeCommand(command: string, options?: ExecSyncOptionsWithBufferEncoding) {
-  execSync(command, { stdio: 'inherit', ...(options || {}) });
+  execSync(command, { stdio: 'inherit', env: process.env, ...(options || {}) });
 }
 
 export function executeCommandWithOutPut(command: string, options?: ExecSyncOptions) {

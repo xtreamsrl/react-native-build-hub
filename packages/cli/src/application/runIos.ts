@@ -64,6 +64,7 @@ function getBootedDevices(allDevices: Device[]) {
 
 function checkBuildPresent(
   buildType: string,
+  config: string,
   target: {
     ext: string;
     buildCmd: string;
@@ -71,7 +72,7 @@ function checkBuildPresent(
   },
   buildId?: string
 ) {
-  const { destination } = getIosBuildDestination(target, buildType, buildId);
+  const { destination } = getIosBuildDestination(target, buildType,config, buildId);
   return fs.existsSync(destination);
 }
 
@@ -172,18 +173,19 @@ function waitForBootedSimulatorOrTimeout() {
 
 export async function runApp(
   buildType?: string,
+  config?:string,
   iosPlatform: IosPlatform = iosBuildPlatforms.simulator,
   forceBuild?: boolean,
   buildId?: string
 ) {
   const buildFlavor = getIosFlavors(buildType);
 
-  if (forceBuild || !checkBuildPresent(buildFlavor.scheme, iosPlatform, buildId)) {
+  if (forceBuild || !checkBuildPresent(buildFlavor.scheme, config || buildFlavor.config, iosPlatform, buildId)) {
     logger.info('Build not present, starting build');
     if (buildId) {
       throw new Error(`The requested build id ${buildId} does not contain an ios build for scheme ${buildFlavor}`);
     }
-    buildIos(buildType, iosPlatform);
+    buildIos(buildType,config, iosPlatform);
   } else {
     logger.info('Build already present, skipping build');
   }
@@ -227,7 +229,7 @@ export async function runApp(
     devicesToRun.push(...requestedDevices);
   }
 
-  const { destination } = getIosBuildDestination(iosPlatform, buildFlavor.scheme, buildId);
+  const { destination } = getIosBuildDestination(iosPlatform, buildFlavor.scheme, config || buildFlavor.config,  buildId);
 
   for (const device of devicesToRun) {
     installApp(device, destination);

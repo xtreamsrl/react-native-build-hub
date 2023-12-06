@@ -15,9 +15,9 @@ export const iosBuildPlatforms = {
 } as const;
 
 export type IosPlatform = {
-  name: 'iphonesimulator';
-  ext: 'app';
-  buildCmd: 'build';
+  name: "iphonesimulator";
+  ext: "app";
+  buildCmd: "build";
 } | {
   name: "iphoneos",
   ext: "app",
@@ -28,15 +28,15 @@ export function getIosBuildDestination(platform: {
   ext: string;
   buildCmd: string;
   name: string
-}, buildType: string, buildId?: string) {
+}, buildType: string, config: string, buildId?: string) {
   const baseBuildFolder = buildId ? getBuildFolderByBuildId(buildId) : getRootDestinationFolder();
 
   // todo handle Debug/release
   const destinationDir = path.join(
     baseBuildFolder,
-    'ios',
+    "ios",
     `${platform.name}-${buildType}`,
-    'Debug'
+    config
   );
   const destination = path.join(destinationDir, `${getAppName()}.${platform.ext}`);
   return { destinationDir, destination };
@@ -58,14 +58,14 @@ function getTargetPaths(buildSettings: string) {
   throw new Error("app destination not found");
 }
 
-export function getBuildFolder(projectName: string, release: boolean, buildFlavor: string, sdk: string) {
+export function getBuildFolder(projectName: string, configuration: string, buildFlavor: string, sdk: string) {
   const buildSettings = executeCommandWithOutPut(
     // todo remove iso and support project
     `xcodebuild \
     -workspace ./ios/${projectName}.xcworkspace \
     -scheme ${buildFlavor} \
     -sdk ${sdk}\
-    -configuration ${release ? "Release" : "Debug"} \
+    -configuration ${configuration} \
     -showBuildSettings\
      -json`,
     {

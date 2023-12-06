@@ -16,6 +16,7 @@ export default class Run extends RemoteAwareCommand {
     android: Flags.boolean({ char: 'a', description: 'Run the android app' }),
     ios: Flags.boolean({ char: 'i', description: 'Run the ios app' }),
     flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
+    config: Flags.string({ char: 'c', description: 'Specify the config to build' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
     iosPlatform: Flags.string({
       description: 'Specify the ios platform to run on',
@@ -40,6 +41,7 @@ export default class Run extends RemoteAwareCommand {
     const shouldRunAndroid = flags.android ?? flags.all;
     const shouldRunIos = flags.ios ?? flags.all;
     const buildFlavor = flags.flavor;
+    const config = flags.config;
     const forceBuild = flags.forceBuild;
     let buildId = flags.buildId;
     let iosPlatform = flags.iosPlatform === 'simulator' ? iosBuildPlatforms.simulator : iosBuildPlatforms.iphone;
@@ -72,7 +74,7 @@ export default class Run extends RemoteAwareCommand {
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runIos(buildFlavor!, iosPlatform, forceBuild, buildId);
+      await runIos(buildFlavor!,config, iosPlatform,  forceBuild, buildId);
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
     this.exit(0);

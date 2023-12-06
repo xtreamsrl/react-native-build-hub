@@ -18,7 +18,8 @@ export default class Build extends Command {
   static flags = {
     ios: Flags.boolean({ char: 'i', description: 'Generate ios native build' }),
     android: Flags.boolean({ char: 'a', description: 'Generate android native build' }),
-    flavor: Flags.string({ char: 'f', description: 'Specify flavor to build' }),
+    flavor: Flags.string({ char: 'f', description: 'Specify flavor/schema to build' }),
+    config: Flags.string({ char: 'c', description: 'Specify the config to build' }),
     release: Flags.boolean({ description: 'Optimized release build', default: false }),
     incremental: Flags.boolean({ char: 'I', description: 'Incremental build', default: false }),
     iosPlatform: Flags.string({
@@ -35,6 +36,7 @@ export default class Build extends Command {
     const shouldBuildIos = flags.ios;
     const buildFlavor = flags.flavor;
     const release = flags.release;
+    const config = flags.config;
     const incremental = flags.incremental;
     let iosPlatform = flags.iosPlatform === 'simulator' ? iosBuildPlatforms.simulator : iosBuildPlatforms.iphone;
 
@@ -42,7 +44,7 @@ export default class Build extends Command {
 
     if (shouldBuildIos) {
       logger.info('Building ios app');
-      buildIos(buildFlavor, iosPlatform);
+      buildIos(buildFlavor, config, iosPlatform);
     }
     if (shouldBuildAndroid) {
       logger.info('Building android');

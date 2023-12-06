@@ -1,6 +1,6 @@
 {
   "name": "@rn-buildhub/cli",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "React Native CLI that caches native builds and speedup your development and release cycle",
   "author": "Luca Micieli",
   "bin": {

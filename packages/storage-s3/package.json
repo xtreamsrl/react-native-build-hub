@@ -1,6 +1,6 @@
 {
   "name": "@rn-buildhub/s3-storage",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "S3 storage for @rn-buildhub/storage-interface",
   "main": "dist/index.js",
   "module": "dist/index.js",

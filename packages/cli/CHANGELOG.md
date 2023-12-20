@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.9.0...v0.10.0) (2023-12-20)
+
+
+### Features
+
+* allow run to be executed without project ([42b31a2](https://github.com/xtreamsrl/react-native-build-hub/commit/42b31a24c16bd0d119f20c89332c31749d98b8ec))
+
+
+
+
+
 # [0.9.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.8.0...v0.9.0) (2023-12-06)
 
 

@@ -5,9 +5,9 @@ import { startMetro, checkIsMetroRunning } from '../application/metroManager';
 import logger from '../application/logger';
 import { iosBuildPlatforms } from '../application/iosUtils';
 import { downloadBuildIfNotPresent } from './makeBuildCurrent';
-import RemoteAwareCommand from '../_projectAwareCommand';
+import MaybeRemoteAwareCommand from "../_maybeProjectAwareCommand";
 
-export default class Run extends RemoteAwareCommand {
+export default class Run extends MaybeRemoteAwareCommand {
   static description = 'Run the native app';
 
   static examples = ['<%= config.bin %> <%= command.id %>'];
@@ -55,6 +55,9 @@ export default class Run extends RemoteAwareCommand {
     }
 
     if (buildId) {
+      if (!this.currentProject.remote){
+        throw new Error('Please run the init command and configure a remote project to run a specific build id')
+      }
       logger.info(`Requested to run specific id ${buildId}`);
       buildId = await downloadBuildIfNotPresent(buildId, this.currentProject);
     }

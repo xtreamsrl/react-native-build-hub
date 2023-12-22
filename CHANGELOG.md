@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.1](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.10.0...v0.10.1) (2023-12-22)
+
+
+### Bug Fixes
+
+* add base terminal guessing function to launch metro ([a7f0777](https://github.com/xtreamsrl/react-native-build-hub/commit/a7f0777fedc991eff4d2179ac41510068ad32e19))
+* update for new rn 73 ([87fbf80](https://github.com/xtreamsrl/react-native-build-hub/commit/87fbf8059d3762d1b7d1b2424dcb3204e65ca7fc))
+* update metro manager path ([94e0b89](https://github.com/xtreamsrl/react-native-build-hub/commit/94e0b8990c184fccfb6ac4a87544fc70998347f4))
+
+
+
+
+
 # [0.10.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.9.0...v0.10.0) (2023-12-20)
 
 

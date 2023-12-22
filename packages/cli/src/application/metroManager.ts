@@ -7,8 +7,9 @@ import { getDefaultUserTerminal, startServerInNewWindow } from '@react-native-co
 export async function startMetro(resetCache = false, port = '8081') {
   startServerInNewWindow(
     Number(port),
-    getDefaultUserTerminal()!,
+    getProjectRootDir(),
     path.join(getProjectRootDir(), 'node_modules/react-native'),
+    getDefaultUserTerminal()!,
   );
 
   while (!(await checkIsMetroRunning(port))) {

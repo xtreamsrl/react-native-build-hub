@@ -2,8 +2,7 @@ import childProcess from 'child_process';
 import axios from 'axios';
 import path from 'path';
 import { getProjectRootDir, sleep } from './utils';
-import { startServerInNewWindow } from '@react-native-community/cli-platform-android/build/commands/buildAndroid/startServerInNewWindow';
-import { getDefaultUserTerminal } from '@react-native-community/cli-tools';
+import { getDefaultUserTerminal, startServerInNewWindow } from '@react-native-community/cli-tools';
 
 export async function startMetro(resetCache = false, port = '8081') {
   startServerInNewWindow(

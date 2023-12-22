@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { executeCommand, getAppName, getProjectRootDir } from './utils';
 import { buildIos } from './buildIos';
 import { getIosBuildDestination, iosBuildPlatforms, IosPlatform } from './iosUtils';
-import { getDevices as getDevicesRNCLI } from '@react-native-community/cli-platform-ios/build/tools/getDevices';
+import { default as getDevicesRNCLI } from '@react-native-community/cli-platform-ios/build/tools/listIOSDevices';
 import path from 'path';
 import { getIosFlavors } from './config';
 import logger from './logger';
@@ -43,8 +43,8 @@ function getIosSimulatorsDevices(): Device[] {
   }));
 }
 
-function getIosPhysicalDevices(): Device[] {
-  const devices = getDevicesRNCLI();
+async function getIosPhysicalDevices(): Promise<Device[]> {
+  const devices = await getDevicesRNCLI();
   return devices
     .filter(d => d.type === 'device' || d.type === 'catalyst')
     .map(d => {
@@ -194,7 +194,7 @@ export async function runApp(
   if (iosPlatform.name === iosBuildPlatforms.simulator.name) {
     devices = getIosSimulatorsDevices();
   } else {
-    devices = getIosPhysicalDevices();
+    devices = await getIosPhysicalDevices();
   }
 
   if (devices.length === 0) {

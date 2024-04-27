@@ -81,14 +81,13 @@ export async function downloadBuild(buildId: string, projectConfig: ProjectConfi
   const adapter = getRemoteStorage(projectConfig);
   const build = await adapter.getBuildInfo(buildId);
   logger.info(`Found ${build.androidBuilds.length} android builds and ${build.iosBuilds.length} ios builds`);
-  // todo improve parallelism
-  for (const buildInfo of build.androidBuilds) {
+  const androidBuildsProms = build.androidBuilds.map(async buildInfo => {
     const tempZipPath = await downloadZipBuild(buildInfo, buildId, adapter);
     const destinationFolder = path.join(getBuildFolderByBuildId(buildId), 'android', buildInfo.flavor, buildInfo.type);
     await unzipFile(tempZipPath, destinationFolder);
     fs.rmSync(tempZipPath);
-  }
-  for (const buildInfo of build.iosBuilds) {
+  });
+  const iosBuildsProms = build.iosBuilds.map(async buildInfo => {
     const tempZipPath = await downloadZipBuild(buildInfo, buildId, adapter);
     const destinationFolder = path.join(
       getRootDestinationFolder(),
@@ -101,7 +100,8 @@ export async function downloadBuild(buildId: string, projectConfig: ProjectConfi
 
     await unzipFile(tempZipPath, destinationFolder);
     fs.rmSync(tempZipPath);
-  }
+  });
+  await Promise.all([...androidBuildsProms, ...iosBuildsProms]);
 }
 
 export async function makeCurrentBuild(buildId: string) {

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.10.2...v0.11.0) (2024-08-09)
+
+
+### Features
+
+* add ios destination platform enrichment to work with rosetta ([bf8f361](https://github.com/xtreamsrl/react-native-build-hub/commit/bf8f361857f8d943bbb19e5af1e2611e578210da))
+
+
+
+
+
 ## [0.10.2](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.10.1...v0.10.2) (2024-05-08)
 
 **Note:** Version bump only for package @rn-buildhub/cli

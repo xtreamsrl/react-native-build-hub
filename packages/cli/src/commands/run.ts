@@ -17,6 +17,7 @@ export default class Run extends MaybeRemoteAwareCommand {
     ios: Flags.boolean({ char: 'i', description: 'Run the ios app' }),
     flavor: Flags.string({ char: 'f', description: 'Specify the android flavor or the ios scheme to build' }),
     config: Flags.string({ char: 'c', description: 'Specify the config to build' }),
+    destination: Flags.string({ char: 'd', description: 'Append this to the standard destination platform, like arch=x86_64 for rosetta emulator' }),
     verbose: Flags.boolean({ description: 'Verbose output' }),
     iosPlatform: Flags.string({
       description: 'Specify the ios platform to run on',
@@ -44,6 +45,7 @@ export default class Run extends MaybeRemoteAwareCommand {
     const config = flags.config;
     const forceBuild = flags.forceBuild;
     let buildId = flags.buildId;
+    let destination = flags.destination;
     let iosPlatform = flags.iosPlatform === 'simulator' ? iosBuildPlatforms.simulator : iosBuildPlatforms.iphone;
 
     logger.setVerbose(flags.verbose);
@@ -77,7 +79,7 @@ export default class Run extends MaybeRemoteAwareCommand {
     }
     if (shouldRunIos) {
       logger.info(`Running ios app ${buildFlavor ? `with flavor ${buildFlavor}` : ''}`);
-      await runIos(buildFlavor!,config, iosPlatform,  forceBuild, buildId);
+      await runIos(buildFlavor!,config, iosPlatform,  forceBuild, buildId, destination);
     }
     logger.info(`Run finished in ${((performance.now() - start) / 1000).toFixed(1)} seconds`);
     this.exit(0);

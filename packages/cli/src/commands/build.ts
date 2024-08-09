@@ -20,6 +20,7 @@ export default class Build extends Command {
     android: Flags.boolean({ char: 'a', description: 'Generate android native build' }),
     flavor: Flags.string({ char: 'f', description: 'Specify flavor/schema to build' }),
     config: Flags.string({ char: 'c', description: 'Specify the config to build' }),
+    destination: Flags.string({ char: 'd', description: 'Append this to the standard destination platform, like arch=x86_64 for rosetta emulator' }),
     release: Flags.boolean({ description: 'Optimized release build', default: false }),
     incremental: Flags.boolean({ char: 'I', description: 'Incremental build', default: false }),
     iosPlatform: Flags.string({
@@ -38,13 +39,14 @@ export default class Build extends Command {
     const release = flags.release;
     const config = flags.config;
     const incremental = flags.incremental;
+    const destination = flags.destination;
     let iosPlatform = flags.iosPlatform === 'simulator' ? iosBuildPlatforms.simulator : iosBuildPlatforms.iphone;
 
     const start = performance.now();
 
     if (shouldBuildIos) {
       logger.info('Building ios app');
-      buildIos(buildFlavor, config, iosPlatform);
+      buildIos(buildFlavor, config, iosPlatform, destination);
     }
     if (shouldBuildAndroid) {
       logger.info('Building android');

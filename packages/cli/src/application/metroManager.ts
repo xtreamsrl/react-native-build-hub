@@ -75,7 +75,7 @@ export async function checkIsMetroRunning(port = '8081') {
     await axios.get(`http://localhost:${port}`);
     return true;
   } catch (ex) {
-    if ((ex as any)?.message.includes('ECONNREFUSED')) {
+    if ((ex as any)?.message?.includes('ECONNREFUSED') || (ex as any)?.code?.includes('ECONNREFUSED')) {
       return false;
     }
     throw ex;

@@ -13,7 +13,7 @@ function installPods() {
   executeCommand("pod install", { cwd: iosFolder });
 }
 
-function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator) {
+function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator, destinationPlatformEnrichment?: string) {
   const iosFolder = path.join(getProjectRootDir(), "ios");
   const workspacePath = path.join(iosFolder, `${appName}.xcworkspace`);
   const buildFlavor = getIosFlavors(schema);
@@ -21,13 +21,14 @@ function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = io
     throw new Error(`No build flavor found for ${schema}`);
   }
 
-  logger.log('builfing config', config);
+  logger.log("builfing config", config);
   const archivePath = `${iosFolder}/build/Products/${appName}.xcarchive`;
 
   const buildCommand = `RCT_NO_LAUNCH_PACKAGER=true xcodebuild \
       -workspace "${workspacePath}" \
       -scheme "${buildFlavor.scheme}" \
       -configuration ${config || buildFlavor.config} \
+      -destination '${platform.destination}${destinationPlatformEnrichment ? `,${destinationPlatformEnrichment}` : ""}' \
       -sdk ${platform.name} \
       -archivePath '${archivePath}' \
       -derivedDataPath ${iosFolder}/DerivedData/${appName} \
@@ -49,7 +50,7 @@ function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = io
 
 }
 
-export function buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator) {
+export function buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator, destination?: string) {
   // installPods();
-  _buildIos(schema, config, platform);
+  _buildIos(schema, config, platform, destination);
 }

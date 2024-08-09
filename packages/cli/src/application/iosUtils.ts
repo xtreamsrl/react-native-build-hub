@@ -5,12 +5,14 @@ export const iosBuildPlatforms = {
   simulator: {
     name: "iphonesimulator",
     ext: "app",
-    buildCmd: "build"
+    buildCmd: "build",
+    destination: "generic/platform=iOS Simulator"
   },
   iphone: {
     name: "iphoneos",
     ext: "app",
-    buildCmd: "build"
+    buildCmd: "build",
+    destination: "generic/platform=iOS"
   }
 } as const;
 
@@ -18,10 +20,12 @@ export type IosPlatform = {
   name: "iphonesimulator";
   ext: "app";
   buildCmd: "build";
+  destination: string;
 } | {
   name: "iphoneos",
   ext: "app",
   buildCmd: "build"
+  destination:string;
 };
 
 export function getIosBuildDestination(platform: {

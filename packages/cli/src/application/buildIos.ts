@@ -13,7 +13,7 @@ function installPods() {
   executeCommand("pod install", { cwd: iosFolder });
 }
 
-function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator, destinationPlatformEnrichment?: string) {
+function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator, destinationPlatformEnrichment?: string, arch?: string) {
   const iosFolder = path.join(getProjectRootDir(), "ios");
   const workspacePath = path.join(iosFolder, `${appName}.xcworkspace`);
   const buildFlavor = getIosFlavors(schema);
@@ -32,6 +32,7 @@ function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = io
       -sdk ${platform.name} \
       -archivePath '${archivePath}' \
       -derivedDataPath ${iosFolder}/DerivedData/${appName} \
+      ${arch ? `ARCS=${arch}` : ""} \
       ${platform.buildCmd}
     `;
 
@@ -50,7 +51,7 @@ function _buildIos(schema?: string, config = "Debug", platform: IosPlatform = io
 
 }
 
-export function buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator, destination?: string) {
+export function buildIos(schema?: string, config = "Debug", platform: IosPlatform = iosBuildPlatforms.simulator, destination?: string, arch?: string) {
   // installPods();
-  _buildIos(schema, config, platform, destination);
+  _buildIos(schema, config, platform, destination, arch);
 }

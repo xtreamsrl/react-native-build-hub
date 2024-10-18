@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.11.0...v0.12.0) (2024-10-18)
+
+**Note:** Version bump only for package @rn-buildhub/storage-interface
+
+
+
+
+
 # [0.11.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.10.2...v0.11.0) (2024-08-09)
 
 **Note:** Version bump only for package @rn-buildhub/storage-interface

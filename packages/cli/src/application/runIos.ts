@@ -177,7 +177,8 @@ export async function runApp(
   iosPlatform: IosPlatform = iosBuildPlatforms.simulator,
   forceBuild?: boolean,
   buildId?: string,
-  destinationPlatformEnrichment?:string
+  destinationPlatformEnrichment?:string,
+  arch?:string
 ) {
   const buildFlavor = getIosFlavors(buildType);
 
@@ -186,7 +187,7 @@ export async function runApp(
     if (buildId) {
       throw new Error(`The requested build id ${buildId} does not contain an ios build for scheme ${buildFlavor}`);
     }
-    buildIos(buildType,config, iosPlatform, destinationPlatformEnrichment);
+    buildIos(buildType,config, iosPlatform, destinationPlatformEnrichment, arch);
   } else {
     logger.info('Build already present, skipping build');
   }

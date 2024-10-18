@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.12.0...v0.13.0) (2024-10-18)
+
+
+### Features
+
+* add support for xcode 16 arch arg in run ([88367ac](https://github.com/xtreamsrl/react-native-build-hub/commit/88367ac3e99722a2d4f1a26353b4b6d91a342740))
+
+
+
+
+
 # [0.12.0](https://github.com/xtreamsrl/react-native-build-hub/compare/v0.11.0...v0.12.0) (2024-10-18)
 
 
